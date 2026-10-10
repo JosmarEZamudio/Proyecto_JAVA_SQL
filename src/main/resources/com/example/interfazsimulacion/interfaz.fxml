@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.Pane?>
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+ prefHeight="466.0" prefWidth="515.0" xmlns="http://javafx.com/javafx/26" 
+ xmlns:fx="http://javafx.com/fxml/1" 
+ fx:controller="com.example.controladoresSimulacion.ControladorCuadrante">
+   <children>
+      <Pane fx:id="pnContenedor" layoutX="91.0" layoutY="33.0" prefHeight="400.0" prefWidth="400.0" />
+   </children>
+</Pane>

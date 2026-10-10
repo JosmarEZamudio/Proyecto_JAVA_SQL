@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.Pane?>
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="382.0" prefWidth="515.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.controladoresRestaurante.ControladorAgregarProducto">
+   <children>
+      <Label layoutX="208.0" layoutY="51.0" text="Agregar productos" />
+      <Label layoutX="86.0" layoutY="124.0" text="Nombre del producto: " />
+      <Label layoutX="97.0" layoutY="182.0" text="Precio del producto: " />
+      <Label layoutX="88.0" layoutY="244.0" text="Imagen del producto: " />
+      <TextField fx:id="txtNombre" layoutX="270.0" layoutY="120.0" />
+      <TextField fx:id="txtPrecio" layoutX="270.0" layoutY="178.0" />
+      <Button fx:id="btnAgregar" layoutX="202.0" layoutY="324.0" mnemonicParsing="false" onAction="#agregarProducto" text="Agregar producto" />
+      <TextField fx:id="txtImagen" layoutX="270.0" layoutY="240.0" />
+      <Button fx:id="btnBuscar" layoutX="434.0" layoutY="240.0" mnemonicParsing="false" onAction="#agregarImagen" text="Buscar" />
+   </children>
+</Pane>
