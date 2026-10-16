@@ -63,8 +63,6 @@ public class ControladorInicioSesion {
                 }else{
                     dialogosMensajes.mensajeError("Informacion Sesion",
                     "Usuario no encontrado, intentete de nuevo.");
-                    txtPassword.clear(); 
-                    txtUsuario.clear();
                 }
             } //Cierra (ResultSet) segundo try
         } //Cierra (Connection y Prepared) primer try
@@ -94,7 +92,11 @@ public class ControladorInicioSesion {
                 return;
         }
     //Cadena de consulta
-        String sql = "SELECT id_restaurante,nombre FROM restaurante WHERE correo = ? AND contrasena = ?";
+        String sql = """
+            SELECT id_restaurante,nombre,coordenada_x,coordenada_y
+            FROM restaurante 
+            WHERE correo = ? AND contrasena = ?
+                """;
     //Inicia conexion y consulta
         try(Connection conexion = controladorConector.conectar();
             PreparedStatement consultar = conexion.prepareStatement(sql);){
@@ -105,7 +107,10 @@ public class ControladorInicioSesion {
                 if(resultado.next()){
                     int id = resultado.getInt("id_restaurante");
                     String nombre = resultado.getString("nombre");
+                    int coordenadaX = resultado.getInt("coordenada_x");
+                    int coordenadaY = resultado.getInt("coordenada_y");
                     datosSesionRestaurante.iniciar(id,nombre); //*** Pasar datos de sesion
+                    datosSesionRestaurante.guardarUbicacion(coordenadaX, coordenadaY); //Pasar datos de la ubicacion
                     dialogosMensajes.mensajeInformacion("Informacion sesion", 
                         "Negocio encontrado, bienvenido."
                     );
@@ -114,8 +119,6 @@ public class ControladorInicioSesion {
                 }else{
                     dialogosMensajes.mensajeError("Informacion sesion", 
                     "Negocio no encontrado, intente de nuevo.");
-                    txtUsuario.clear();               
-                    txtPassword.clear();
                 }
             } //Cierra segundo try (ResultSet)
         }//Ciera primer try (Connection y Prepared)

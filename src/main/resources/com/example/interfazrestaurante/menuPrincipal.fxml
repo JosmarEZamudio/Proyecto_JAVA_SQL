@@ -12,5 +12,6 @@
       <Label layoutX="194.0" layoutY="69.0" text="Hola, escoja una opcion." />
       <Button fx:id="btnAgregar" layoutX="197.0" layoutY="233.0" mnemonicParsing="false" onAction="#interfazAgregar" prefHeight="25.0" prefWidth="120.0" text="Agregar productos" />
       <Button fx:id="btnConsultar" layoutX="199.0" layoutY="180.0" mnemonicParsing="false" onAction="#interfazConsultar" prefHeight="25.0" prefWidth="120.0" text="Consultar producto" />
+      <Button fx:id="txtActivar" layoutX="32.0" layoutY="412.0" mnemonicParsing="false" onAction="#ubicacion" text="Activar ubicacion" />
    </children>
 </Pane>

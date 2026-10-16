@@ -5,9 +5,7 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.Pane?>
 
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" 
-minWidth="-Infinity" prefHeight="311.0" prefWidth="364.0" xmlns="http://javafx.com/javafx/26" 
-xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.controladoresSimulacion.ControladorUbicacion">
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="311.0" prefWidth="364.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.controladoresCliente.ControladorUbicacion">
    <children>
       <Label layoutX="79.0" layoutY="43.0" text="Antes de ordenar, ingrese su ubicacion" />
       <Label layoutX="65.0" layoutY="114.0" text="Coordenada X:" />

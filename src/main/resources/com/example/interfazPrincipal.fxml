@@ -12,7 +12,7 @@
          <children>
             <Button fx:id="btnRestaurante" layoutX="57.0" layoutY="122.0" mnemonicParsing="false" onAction="#opcionesRestaurante" prefHeight="25.0" prefWidth="87.0" text="Restaurante" />
             <Button fx:id="btnCliente" layoutX="57.0" layoutY="169.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="87.0" text="Cliente" />
-            <Button fx:id="btnRepartidor" layoutX="57.0" layoutY="226.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="87.0" text="Repartidor" />
+            <Button fx:id="btnRepartidor" layoutX="57.0" layoutY="226.0" mnemonicParsing="false" onAction="#interfazRepartidor" prefHeight="25.0" prefWidth="87.0" text="Repartidor" />
             <Button fx:id="btnSimulacion" layoutX="57.0" layoutY="275.0" mnemonicParsing="false" onAction="#simulacion" prefHeight="25.0" prefWidth="87.0" text="Simulacion" />
             <Button fx:id="btnSalir" layoutX="57.0" layoutY="330.0" mnemonicParsing="false" onAction="#salir" prefHeight="25.0" prefWidth="87.0" text="Salir" />
             <Button fx:id="btnSesion" layoutX="57.0" layoutY="74.0" mnemonicParsing="false" onAction="#iniciarSesion" prefHeight="25.0" prefWidth="87.0" text="Iniciar Sesion" />

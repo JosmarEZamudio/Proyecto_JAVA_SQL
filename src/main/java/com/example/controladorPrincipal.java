@@ -1,6 +1,4 @@
 package com.example;
-import java.io.IOException;
-
 //Librerias para trabajar con objetos de fxml
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -10,7 +8,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;
 //Librerias adicionales
-//import com.example.controladorSesion.datosSesionCliente;
+import java.io.IOException;
 
 public class controladorPrincipal {
 //Objeto dialogos
@@ -76,18 +74,24 @@ public class controladorPrincipal {
     
     Pane menu = loaderRestaurante.load();
     contenedorPrincipal.setContent(menu);
-    
     }
 
 //Metodo para ver la simulacion
     @FXML 
     private void simulacion() throws IOException{
-        FXMLLoader loaderSimulacion = new FXMLLoader(
-            getClass().getResource("/com/example/interfazsimulacion/interfaz.fxml")
-        );
-
-        Pane simulacion = loaderSimulacion.load();
-        contenedorPrincipal.setContent(simulacion);
+    //Cargar archivo fxml
+        try{
+            FXMLLoader loaderSimulacion = new FXMLLoader(
+                getClass().getResource("/com/example/interfazsimulacion/interfaz.fxml")
+            );
+    //Obtener raiz y setear contenedor
+            Pane simulacion = loaderSimulacion.load();
+            contenedorPrincipal.setContent(simulacion);
+        }
+        catch(IOException e){
+            dialogosMensajes.mensajeError("Informacion error", 
+            "No se pudo cargar la interfaz.");
+        }
     }
 
 
@@ -101,6 +105,17 @@ public class controladorPrincipal {
     public Pane contenedorPane(){
         return contenedorSaludo;
 
+    }
+
+//Metodo para ver la interfaz del repartidor
+    @FXML 
+    private void interfazRepartidor() throws IOException{
+        FXMLLoader loaderRepartidor = new FXMLLoader(
+            getClass().getResource("/com/example/interfazrepartidor/interfazPrincipal.fxml")
+        );
+
+        Pane repartidor = loaderRepartidor.load();
+        contenedorPrincipal.setContent(repartidor);
     }
 
 //*****Metodo iniciales********* 
@@ -118,7 +133,7 @@ public class controladorPrincipal {
         saludoInicial();
         btnCliente.setDisable(false);
         btnRestaurante.setDisable(false);
-        btnRepartidor.setDisable(true);
+        btnRepartidor.setDisable(false);
         btnSimulacion.setDisable(false);        
     }
     

@@ -4,6 +4,7 @@ import java.io.IOException;
 //Importar librerias de sql
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 //Importar objetos de fxml
 import javafx.fxml.FXML;
@@ -39,12 +40,6 @@ public class ControladorRegistroCliente {
 //Metodo para registrar un cliente nuevo
     @FXML 
     private void registrarCliente() throws SQLException{
-        //Obtener textos
-            String nombre = txtNombre.getText();
-            String apellido = txtApellido.getText();
-            String telefono = txtTelefono.getText();
-            String correo = txtCorreo.getText();
-            String password = txtPassword.getText();
         //Validacion Text vacios
         if (txtNombre.getText().isBlank() ||
             txtApellido.getText().isBlank() ||
@@ -56,23 +51,48 @@ public class ControladorRegistroCliente {
             );
                 return;        
         }
+    //Obtener textos
+        String nombre = txtNombre.getText();
+        String apellido = txtApellido.getText();
+        String telefono = txtTelefono.getText();
+        String correo = txtCorreo.getText();
+        String password = txtPassword.getText();
         //Inicia consulta, aqui se crea la sentencia sql
             int resultado = 0;
-        String campos = "nombre,apellido_paterno,telefono,correo,contrasena";
-        String sql = "INSERT INTO cliente("+campos+") VALUES(?,?,?,?,?)";
+        // String campos = "nombre,apellido_paterno,telefono,correo,contrasena";
+        //String sqlInsertar = "INSERT INTO cliente("+campos+") VALUES(?,?,?,?,?)";
+        String sqlInsertar = """
+                INSERT INTO cliente(nombre,apellido_paterno,telefono,correo,contrasena)
+                VALUES(?,?,?,?,?)
+        """;
+        String sqlConsultar = "SELECT COUNT(*) AS resultado FROM cliente WHERE correo = ?";
 //***** Empieza conexion e insersion      
         try(Connection conexion = controladorConector.conectar();){
             conexion.setAutoCommit(false);
+        //**************************Inicia consulta
+            try(PreparedStatement consultar = conexion.prepareStatement(sqlConsultar);){
+                consultar.setString(1, correo);
+                try(ResultSet consulta = consultar.executeQuery();){
+                    consulta.next();
+                    int existe = consulta.getInt("resultado");
+                    if(existe == 1){
+                        dialogosMensajes.mensajeInformacion("Informacion error", 
+                        "Este correo "+correo+" ya esta en uso.");
+                        return;
+                    }
+                }//Termina try ResultSet
+            }//Termina try consulta
+        //***************** Termina consulta
         //Segundo try
             try{
-            PreparedStatement agregar = conexion.prepareStatement(sql);
+            PreparedStatement agregar = conexion.prepareStatement(sqlInsertar);
         
             agregar.setString(1, nombre);
             agregar.setString(2, apellido);
             agregar.setString(3, telefono);
             agregar.setString(4, correo);
             agregar.setString(5, password);
-        //Cuantas filas fueron afectadas 
+        //Cuantas registros fueron efectuados
             resultado = agregar.executeUpdate();
         conexion.commit();
             }catch(SQLException e){
@@ -82,11 +102,6 @@ public class ControladorRegistroCliente {
                 }
             }
             if (resultado == 1){
-            //Limpiar txt
-                txtApellido.clear();
-                txtTelefono.clear();
-                txtCorreo.clear();
-                txtPassword.clear(); 
             //Mensaje y retorno
                 dialogosMensajes.mensajeInformacion("Registo exitoso.", 
                 "Usted ha sido registrado correctamente."); 

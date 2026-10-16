@@ -177,7 +177,7 @@ public class ControladorPrincipalCliente {
         contenedor.setContent(producto);
     }
 
-//Metodo para para consultar la cantidad depedidos realizados y avanzar al historial
+//Metodo para para consultar la cantidad depedidos realizados y mostar interfaz al historial
     @FXML 
     private int consultaPedidos() throws SQLException{
     //Incializar variable de retorno y obtener id_cliente
@@ -209,7 +209,7 @@ public class ControladorPrincipalCliente {
     //Cargar archivo fxml
         try{
         FXMLLoader loaderUbicacion = new FXMLLoader(
-            getClass().getResource("/com/example/interfazsimulacion/interfazUbicacion.fxml")
+            getClass().getResource("/com/example/interfazcliente/interfazUbicacion.fxml")
         );
     //Obtener escena
         Scene escenaNueva = new Scene(loaderUbicacion.load());

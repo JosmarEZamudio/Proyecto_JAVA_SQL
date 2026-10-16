@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.Pane?>
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="466.0" prefWidth="515.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.controladoresRepartidor.ControladorRegistro">
+   <children>
+      <Label layoutX="236.0" layoutY="14.0" text="Registro" />
+      <Label layoutX="123.0" layoutY="74.0" text="Nombre: " />
+      <Label layoutX="82.0" layoutY="117.0" text="Apellido paterno:" />
+      <Label layoutX="80.0" layoutY="165.0" text="Apellido materno:" />
+      <TextField fx:id="txtNombre" layoutX="223.0" layoutY="70.0" />
+      <TextField fx:id="txtApellidoPaterno" layoutX="223.0" layoutY="113.0" />
+      <TextField fx:id="txtApellidoMaterno" layoutX="223.0" layoutY="161.0" />
+      <Label layoutX="197.0" layoutY="41.0" text="Informacion del cliente" />
+      <Label layoutX="202.0" layoutY="292.0" text="Informacion vehiculo" />
+      <Label layoutX="77.0" layoutY="341.0" text="Tipo de vehiculo: " />
+      <Label layoutX="125.0" layoutY="388.0" text="Placas: " />
+      <TextField fx:id="txtVehiculo" layoutX="220.0" layoutY="329.0" />
+      <TextField fx:id="txtPlacas" layoutX="220.0" layoutY="376.0" />
+      <Button fx:id="btnRegistrar" layoutX="138.0" layoutY="425.0" mnemonicParsing="false" onAction="#registrar" text="Registrar" />
+      <Button fx:id="btnCancelar" layoutX="318.0" layoutY="425.0" mnemonicParsing="false" onAction="#cancelar" text="Cancelar" />
+      <Label layoutX="109.0" layoutY="248.0" text="Contraseña:" />
+      <TextField fx:id="txtPassword" layoutX="223.0" layoutY="244.0" />
+      <Label layoutX="131.0" layoutY="212.0" text="Correo:" />
+      <TextField fx:id="txtCorreo" layoutX="223.0" layoutY="200.0" />
+   </children>
+</Pane>

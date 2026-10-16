@@ -3,8 +3,9 @@ import java.io.IOException;
 //Librerias para usar sql y mensajes
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
-
+//Librerias adicionales
 import com.example.controladorConector;
 import com.example.dialogosMensajes;
 //Componente de java fxml
@@ -37,14 +38,9 @@ public class ControladorRegistroRestaurante {
 //Metodo para registrar restaurante
     @FXML 
     private void registrarRestaurante() throws Exception{
-
-        String nombre = txtNombre.getText();
-        String telefono = txtTelefono.getText();
-        String correo = txtCorreo.getText();
-        String password = txtPassword.getText();
-
+    //Incializar varible para verificar cuantos registros fueron agregados
         int resultado = 0;
-
+    //Validar txt en blanco
         if (txtNombre.getText().isBlank() ||
             txtTelefono.getText().isBlank() ||
             txtCorreo.getText().isBlank() ||
@@ -54,16 +50,35 @@ public class ControladorRegistroRestaurante {
             "Todos los datos son necesarios, ¡¡intente de nuevo!!");
             return;
         }
-
+    //Obtener datos de txt
+        String nombre = txtNombre.getText();
+        String telefono = txtTelefono.getText();
+        String correo = txtCorreo.getText();
+        String password = txtPassword.getText();
+    //Sentencias sql
         String campos = "nombre,telefono,correo,contrasena";
-        String sql = "INSERT INTO restaurante("+campos+") VALUES(?,?,?,?)";
+        String sqlInsertar = "INSERT INTO restaurante("+campos+") VALUES(?,?,?,?)";
+        String sqlConsultar = "SELECT COUNT(*) AS resultado FROM restaurante WHERE correo = ?";
     //Empieza try Connection
         try(Connection conexion = controladorConector.conectar();){
-
             conexion.setAutoCommit(false);
-        //Empieza try para Prepared
+        //***************** Empieza consulta
+            try(PreparedStatement consultar = conexion.prepareStatement(sqlConsultar);){
+                consultar.setString(1, correo);
+                try(ResultSet consulta = consultar.executeQuery();){
+                    consulta.next();
+                    int existe = consulta.getInt("resultado");
+                    if (existe == 1){
+                        dialogosMensajes.mensajeInformacion("Informacion error", 
+                        "Este correo "+correo+" ya esta en uso.");
+                        return;
+                    }
+                }//Termina segundo try ResultSet
+            }//Termina primer try Prepared
+        //************Termina consulta
+        //Empieza try Prepared (insertar)
             try{
-            PreparedStatement agregar = conexion.prepareStatement(sql);
+            PreparedStatement agregar = conexion.prepareStatement(sqlInsertar);
                 agregar.setString(1, nombre);
                 agregar.setString(2, telefono);
                 agregar.setString(3, correo);
@@ -76,7 +91,7 @@ public class ControladorRegistroRestaurante {
                     throw e;
                 } //Atrapar, ejecutar y escalar error de Prepared
             } 
-
+        //Validar si se registro el usuario
             if (resultado == 1){
                 dialogosMensajes.mensajeInformacion("Registro exitoso.",
                  "Su negocio has sido registrado correctamente");
@@ -94,7 +109,7 @@ public class ControladorRegistroRestaurante {
         }
         catch(IOException e){
             dialogosMensajes.mensajeError("Informacion error", 
-            "No se pudo cargar la intfaz, intente de nuevo.");
+            "No se pudo cargar la interfaz, intente de nuevo.");
             return;
         }
     }

@@ -24,16 +24,16 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-
-//Librerias adicionales
+//Librerias adicionales, clases, etcerta
 import com.example.controladorConector;
 import com.example.dialogosMensajes;
 import com.example.controladorSesion.datosSesionCliente;
+import com.example.controladoresSimulacion.ControladorUbicaciones;
+//Librerias para fechas, archivos
 import java.time.LocalDate;
-
-
 import java.io.File;
 import java.io.IOException;
+
 public class ControladorCompraProducto {
     ControladorDetalle lista = new ControladorDetalle();
 //Objetos de fxml
@@ -68,12 +68,14 @@ public class ControladorCompraProducto {
         int columna = 0; //Valor de columna donde se posicionara el producto
     //Obtener id de restaurante para desplegar los productos del restaurante seleccionado
         int id = datosSesionCompra.getIdRestaurante();
+        int disponibilidad = 1;
     //Sentencia sql
-        String sql = "SELECT id_producto,nombre,precio FROM producto WHERE id_restaurante = ?";
+        String sql = "SELECT id_producto,nombre,precio FROM producto WHERE id_restaurante = ? AND disponibilidad = ?";
     //Abre primer try Connection y Prepared  
         try(Connection conexion = controladorConector.conectar();
             PreparedStatement consultar = conexion.prepareStatement(sql);){
                 consultar.setInt(1, id);
+                consultar.setInt(2, disponibilidad);
                 try(ResultSet resultado = consultar.executeQuery();){
                     while(resultado.next()){
                         idProducto = resultado.getInt("id_producto");
@@ -151,7 +153,6 @@ public class ControladorCompraProducto {
             //LLamar funciones, quitar elemento en la lista y quitar datos a la barra
                 cantidadNueva = lista.quitar(idP, nombreProducto, id, productoPrecio);
                 datosSesionCompra.quitarCompra(1, productoPrecio);
-                
             //Imprimir resultados
                     lblAgregado.setText("Productos agregados: "+datosSesionCompra.getCantidad());
                     lblTotal.setText("Total: $"+datosSesionCompra.getTotal());
@@ -236,11 +237,12 @@ public class ControladorCompraProducto {
                 agregar.setInt(2, estado);
                 agregar.setDate(3,java.sql.Date.valueOf(fecha)); 
                 agregar.executeUpdate();
-
+            //Empieza segundo try
                 try(ResultSet resultado = agregar.getGeneratedKeys();){
                     if(resultado.next()){
                         idPedido = resultado.getInt(1);
                         datosSesionCompra.idpedido(idPedido); //Guardar id pedido en el metodo estatico
+                        ControladorUbicaciones.setIdPedido(idPedido); //Guardar el id del pedido
                     }
                 }//Cierra segundo try
                 agregarDetalle(conexion);

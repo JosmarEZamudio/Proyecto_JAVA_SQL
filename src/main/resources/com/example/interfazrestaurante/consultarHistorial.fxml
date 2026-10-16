@@ -7,10 +7,16 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
 
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="466.0" prefWidth="515.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1">
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+ prefHeight="466.0" prefWidth="515.0" xmlns="http://javafx.com/javafx/26" 
+ xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <Label layoutX="142.0" layoutY="23.0" text="Historial de pedido completados a la fechas" />
+      <Label layoutX="87.0" layoutY="1.0" text="Historial de pedido completados a la fecha">
+         <font>
+            <Font size="18.0" />
+         </font></Label>
       <ScrollPane layoutX="7.0" layoutY="49.0" prefHeight="200.0" prefWidth="501.0">
          <content>
             <TableView prefHeight="200.0" prefWidth="476.0">
@@ -39,5 +45,6 @@
             </TableView>
          </items>
       </SplitPane>
+      <Label layoutX="149.0" layoutY="32.0" prefHeight="17.0" prefWidth="217.0" text="5.- Entregado 6.-Cancelado 7.-Accidente" />
    </children>
 </Pane>

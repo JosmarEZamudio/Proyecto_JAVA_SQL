@@ -8,11 +8,10 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
 
-
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="466.0" prefWidth="515.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1">
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="466.0" prefWidth="515.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.controladoresRepartidor.ControladorPrincipal">
    <children>
-      <Button layoutX="109.0" layoutY="364.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="70.0" text="Activar" />
-      <Button layoutX="323.0" layoutY="364.0" mnemonicParsing="false" text="Desactivar" />
+      <Button fx:id="btnActivar" layoutX="109.0" layoutY="364.0" mnemonicParsing="false" onAction="#guardarUbicacion" prefHeight="25.0" prefWidth="70.0" text="Activar" />
+      <Button fx:id="btnDesactivar" layoutX="323.0" layoutY="364.0" mnemonicParsing="false" onAction="#desactivar" text="Desactivar" />
       <Label layoutX="232.0" layoutY="105.0" prefHeight="27.0" prefWidth="79.0" text="Ubicacion">
          <font>
             <Font size="18.0" />
@@ -20,15 +19,17 @@
       </Label>
       <Label layoutX="154.0" layoutY="229.0" text="Coordenada Y:" />
       <Label layoutX="153.0" layoutY="173.0" text="Coordenada X:" />
-      <TextField layoutX="260.0" layoutY="169.0" />
-      <TextField layoutX="260.0" layoutY="217.0" />
-      <MenuButton fx:id="mnbOciones" layoutX="34.0" layoutY="30.0" mnemonicParsing="false" text="Opciones">
+      <TextField fx:id="txtCoordenadaX" layoutX="260.0" layoutY="169.0" />
+      <TextField fx:id="txtCoordenadaY" layoutX="260.0" layoutY="217.0" />
+      <MenuButton fx:id="mnbOpciones" layoutX="34.0" layoutY="30.0" mnemonicParsing="false" text="Opciones">
         <items>
-          <MenuItem fx:id="mniInformacion" mnemonicParsing="false" text="Action 1" />
-          <MenuItem fx:id="mniHistorial" mnemonicParsing="false" text="Action 2" />
+          <MenuItem fx:id="mniInformacion" mnemonicParsing="false" onAction="#interfazPersonal" text="Informacion" />
+          <MenuItem fx:id="mniHistorial" mnemonicParsing="false" text="Historial pedidos" />
         </items>
       </MenuButton>
-      <Label layoutX="214.0" layoutY="278.0" prefHeight="17.0" prefWidth="149.0" text="Actual X: " />
-      <Label layoutX="214.0" layoutY="308.0" prefHeight="17.0" prefWidth="175.0" text="Actual Y: " />
+      <Label fx:id="lblActualX" layoutX="214.0" layoutY="278.0" prefHeight="17.0" prefWidth="149.0" text="Actual X: " />
+      <Label fx:id="lblActualY" layoutX="214.0" layoutY="308.0" prefHeight="17.0" prefWidth="175.0" text="Actual Y: " />
+      <Button fx:id="btnIniciar" layoutX="376.0" layoutY="30.0" mnemonicParsing="false" onAction="#iniciar" text="Iniciar sesion" />
+      <Button fx:id="btnRegistrar" layoutX="376.0" layoutY="72.0" mnemonicParsing="false" onAction="#registrar" prefHeight="25.0" prefWidth="84.0" text="Registrarse" />
    </children>
 </Pane>

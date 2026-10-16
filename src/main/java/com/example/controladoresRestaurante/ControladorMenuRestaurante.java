@@ -7,6 +7,8 @@ import javafx.scene.control.ScrollPane;
 //Librerias para trabajar con ventanas
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 //Librerias para trabajar con sql
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -31,6 +33,8 @@ public class ControladorMenuRestaurante { //Inicio de la clase
     private Button btnPendiente;
     @FXML 
     private Button btnHistorial;
+    @FXML 
+    private Button btnActivar;
 //Metodo para ir a la interfaz de producto desplegados
     @FXML 
     private void interfazProducto() throws IOException{
@@ -82,6 +86,8 @@ public class ControladorMenuRestaurante { //Inicio de la clase
          catch(IOException e){
             dialogosMensajes.mensajeError("Informacion error", 
             "No se puede cargar la interfaz, si el error persiste contactar a soporte.");
+            
+            return;
         }       
     }
 //Metodo para ir a la interfaz de agregar producto
@@ -118,6 +124,7 @@ public class ControladorMenuRestaurante { //Inicio de la clase
         catch(IOException e){
             dialogosMensajes.mensajeError("Informacion error", 
             "No se puede cargar la interfaz, si el error persiste contactar a soporte.");
+            e.printStackTrace();
             return;
         }   
     }
@@ -139,6 +146,23 @@ public class ControladorMenuRestaurante { //Inicio de la clase
             "No se puede cargar la interfaz, si el error persiste contactar a soporte.");
             return;
         }   
+    }
+
+//Metodo para ir a la interfaz de ubicacion
+    @FXML
+    private void ubicacion() throws IOException{
+        FXMLLoader loaderUbicacion = new FXMLLoader(
+            getClass().getResource("/com/example/interfazrestaurante/interfazUbicacion.fxml")
+        );
+
+        Scene ubicacion = new Scene(loaderUbicacion.load());
+        Stage ventanaNueva = new Stage();
+
+        ventanaNueva.setTitle("Guardar ubicacion");
+        ventanaNueva.initModality(Modality.APPLICATION_MODAL);
+        ventanaNueva.setScene(ubicacion);
+        ventanaNueva.showAndWait();
+
     }
 
 //Metodo para hacer una consulta sobre si hay productos existente
