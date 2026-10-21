@@ -54,7 +54,7 @@ public class ControladorUbicacion {
                 actualizar.executeUpdate();
             }//Cierra TWR
             conexion.commit();
-            datosSesionCliente.ubicacion(coordenadaX, coordenadaY);
+            //datosSesionCliente.guardarUbicacion((double)coordenadaX, (double)coordenadaY);
         //Mostrar mensaje y bloquear ciertos controladores
             dialogosMensajes.mensajeInformacion("Informacion", 
             "Ubicacion guardada con exito.");

@@ -11,6 +11,7 @@ import java.io.IOException;
 public class Main extends Application{
     @Override 
         public void start(Stage stage) throws IOException{
+        //RutasImagenes.inicializar();
         try{
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("interfazPrincipal.fxml")
@@ -20,6 +21,7 @@ public class Main extends Application{
 
             stage.setTitle("Menu principal");
             stage.setScene(escenaNueva);
+            stage.setResizable(false);
             stage.show();
 
         }catch(IOException e){

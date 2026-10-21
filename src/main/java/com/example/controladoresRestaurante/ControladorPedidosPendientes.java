@@ -17,10 +17,15 @@ import java.sql.SQLException;
 //Librerias, clases, etc adicionales
 import com.example.controladorConector;
 import com.example.dialogosMensajes;
+import com.example.controladorPrincipal;
 import com.example.controladorSesion.datosSesionRestaurante;
+import com.example.controladoresSimulacion.ControladorAsignarRepartidor;
+import com.example.controladoresSimulacion.ControladorUbicaciones;
 
 
 public class ControladorPedidosPendientes {
+//Cargar interfaz
+    private controladorPrincipal principal;
 //Objeros fxml button 
     @FXML 
     private Button btnBuscar;
@@ -59,7 +64,6 @@ public class ControladorPedidosPendientes {
 //Metodo para consultar pedidos pendientes
     private void consultarPendiente() throws SQLException{
     //Variable para la consulta sql
-        int valor = 5;
         int idRestaurante = datosSesionRestaurante.getIdRestaurante();
     //Variables donde se guardaran temporalmente los resultados de as consultas
         int idPedido;
@@ -76,13 +80,13 @@ public class ControladorPedidosPendientes {
                 ON detallePedido.id_producto = producto.id_producto
                 JOIN restaurante 
                 ON producto.id_restaurante = restaurante.id_restaurante
-                WHERE pedido.estado <= ? AND restaurante.id_restaurante = ?
+                WHERE pedido.estado = ? AND restaurante.id_restaurante = ?
                 GROUP BY id_pedido
                 """;
     //Empieza try Connection y Prepared
         try(Connection conexion = controladorConector.conectar();
             PreparedStatement consultar = conexion.prepareStatement(sql);){
-                consultar.setInt(1, valor);
+                consultar.setInt(1, 0);
                 consultar.setInt(2, idRestaurante);
             //Empieza segundo try
                 try(ResultSet resultado = consultar.executeQuery();){
@@ -124,13 +128,69 @@ public class ControladorPedidosPendientes {
                 
                 tbvPedido.getItems().clear();
                 asignarPendiente();
+                consultarPendiente();
                 tbvPedido.setItems(listaPendientes);
         }
         catch(SQLException e){
             dialogosMensajes.mensajeError("Informacion error", 
             "No se pudo actualizar el estado, intente de nuevo");
         }
+    //Obtener ubicaciones del cliente y del negocio para enviarlos a la simulacion
+        consultarUbicacionCliente();
+        ControladorUbicaciones.setUbicacionNegocio(datosSesionRestaurante.getCoordenadaX(),
+                datosSesionRestaurante.getCoordenadaY(), datosSesionRestaurante.getDireccion());
+    //Empieza simulacion 
+        ControladorAsignarRepartidor asignar = new ControladorAsignarRepartidor();
+        asignar.repartidorCercano();
+    
+        principal.iniciarSimulacion();
+       
+    //Imprime coordenadas para validar
+    
+        System.out.println(ControladorUbicaciones.getCoordenadaXCliente()+" , "
+        +ControladorUbicaciones.getCoordenadaYCliente());
+
+        System.out.println(ControladorUbicaciones.getCoordenadaXNegocio()+" , "
+        +ControladorUbicaciones.getCoordenadaYNegocio());
+
+        System.out.println(ControladorUbicaciones.getCoordenadaYRepartidor()+" , "
+        +ControladorUbicaciones.getCoordenadaXRepartidor());
     }
+
+//Metodo para obtener la direcion del cliente 
+    private void consultarUbicacionCliente() throws SQLException{
+    //Sentencia sql
+        String sql = """
+            SELECT ubicacion.coordenada_x, ubicacion.coordenada_y, ubicacion.direccion, cliente.id_cliente
+            FROM pedido JOIN cliente
+            ON pedido.id_cliente = cliente.id_cliente
+            JOIN ubicacion
+            ON cliente.id_cliente = ubicacion.id_cliente 
+            WHERE pedido.estado = ? AND pedido.id_pedido = ? AND ubicacion.activo = ?
+        """;
+    //Incia try Connection y prepared
+        try(Connection conexion = controladorConector.conectar();
+            PreparedStatement consultar = conexion.prepareStatement(sql);){
+                consultar.setInt(1, 1);
+                consultar.setInt(2, idPublica);
+                consultar.setInt(3, 1);
+            //Inicia try ResultSet
+                try(ResultSet resultado = consultar.executeQuery();){
+                    if(resultado.next()){
+                        Double x = resultado.getDouble(1);
+                        Double y = resultado.getDouble(2);
+                        String direccion = resultado.getString(3);
+                    //Enviar ubicacion del cliente a la simulacion
+                        ControladorUbicaciones.setUbicacionCliente(x, y,direccion);
+                    }
+                }//Termina segundo try
+        }//Termina primer try
+        catch(SQLException e){
+            dialogosMensajes.mensajeError("Informacion error", 
+            "No se pudo obtener la direccion del cliente.");
+        }
+    }      
+
 //Metodo para consultar el detalle de pedidos pendientes mediante seleccion en table
     @FXML 
     private void detallePendienteSeleccionar() throws SQLException{
@@ -145,9 +205,9 @@ public class ControladorPedidosPendientes {
                 if(seleccionado != null){
                     idPedido = seleccionado.getId();
                     idPublica = seleccionado.getId();
-                    System.out.println(idPedido);
+                    System.out.println(idPublica);
                 }else{
-                    System.out.println("no"+idPedido);
+                    System.out.println("no "+idPublica);
                     return;
                 }
             //Llamar columnas
@@ -155,6 +215,7 @@ public class ControladorPedidosPendientes {
             //Abre try
                 try{
                     consultarDetallePendiente(idRestaurante, idPedido);
+                    ControladorUbicaciones.setIdPedido(idPublica);
                     tbvDetalle.setItems(listaDetalle);
                 }
                 catch(SQLException e){
@@ -265,6 +326,12 @@ public class ControladorPedidosPendientes {
         tbcDetalleCantidad.setCellValueFactory(
             new PropertyValueFactory<>("cantidad")
         );
+    }
+
+//Asingar controlador principal
+    public void setControladorPrincipal(controladorPrincipal principal) {
+        System.out.println("Setter del menú recibió: " + principal);
+        this.principal = principal;
     }
 
 //Metodo de inicializacion

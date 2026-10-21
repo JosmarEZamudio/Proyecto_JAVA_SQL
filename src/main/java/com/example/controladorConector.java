@@ -9,8 +9,8 @@ public class controladorConector {
 
     public static Connection conectar() throws SQLException{
             String url = "jdbc:mysql://localhost:3306/proyectoCopia";
-            String usuario = "root";
-            String password = "7004";
+            String usuario = "gestion_app";
+            String password = "Cambia_Esta_Clave_2026!";
             return DriverManager.getConnection(url, usuario, password);
     }
     

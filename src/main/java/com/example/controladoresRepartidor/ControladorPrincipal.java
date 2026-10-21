@@ -16,9 +16,9 @@ import javafx.scene.Scene;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.concurrent.ThreadLocalRandom;
 //Librerias,clases adicionales
 import java.io.IOException;
-
 import com.example.controladorConector;
 import com.example.dialogosMensajes;
 import com.example.controladorSesion.datosSesionRepartidor;
@@ -88,7 +88,7 @@ public class ControladorPrincipal {
         }
     }
 
-//Metodo para mostar la interfaz de registro
+//Metodo para mostrar la interfaz de registro
     @FXML
     private void registrar() throws IOException{
     //Cargar archivo fxml
@@ -136,63 +136,55 @@ public class ControladorPrincipal {
     }
 
 //Metodo para guardar ubicacion del repartidor
+        public static Double[] generarUbicacionAleatoria(
+            Double longitudCentro, Double latitudCentro){
+            Double radioMaximo = 8.0; // kilómetros
+            Double distancia = ThreadLocalRandom.current()
+                    .nextDouble(0, radioMaximo);
+            Double angulo = ThreadLocalRandom.current()
+                    .nextDouble(0, 2 * Math.PI);
+            Double nuevaLatitud = latitudCentro
+                    + (distancia * Math.cos(angulo)) / 111.32;
+            Double nuevaLongitud = longitudCentro
+                    + (distancia * Math.sin(angulo))
+                    / (111.32 * Math.cos(
+                            Math.toRadians(latitudCentro)));
+            return new Double[]{nuevaLongitud, nuevaLatitud};
+    }
+
+//Metodo para imprimir las variables generadas
     @FXML 
-    private void guardarUbicacion() throws SQLException{
-    //Validar txt en blanco
-        if(txtCoordenadaX.getText().isBlank() || txtCoordenadaY.getText().isBlank()){
-            dialogosMensajes.mensajeInformacion("Mensaje informacion", 
-            "La ubicacion no existe!!");
-            return;
-        }
-    //Obtener variables a utilizar
-        int coordenadaX = Integer.valueOf(txtCoordenadaX.getText());
-        int coordenadaY = Integer.valueOf(txtCoordenadaY.getText());
-        int idRepartidor = datosSesionRepartidor.getIdRepartidor();
+    private void generarUbicacion() throws SQLException{
+    //Ubicaciion aleatoria
+        Double[] ubicacion = generarUbicacionAleatoria(-100.3673021,25.8397959);
+    //Mostrar coordenadas
+        txtCoordenadaX.setText(String.format("Longitud: %.7f", ubicacion[0]));
+        txtCoordenadaY.setText(String.format("Latitud: %.7f", ubicacion[1]));
+    //Obtener id del repartidor
+        Integer id = datosSesionRepartidor.getIdRepartidor();
     //Sentencia sql
         String sql = """
-                    UPDATE repartidor
-                    SET x_actual = ?, y_actual = ?, activo = ?, disponibilidad = ?
-                    WHERE id_repartidor = ?
-                """;
-    //Declarar conexion como nula
-        Connection conexion = null;
-    //Empieza try
-        try{
-            conexion = controladorConector.conectar();
-            conexion.setAutoCommit(false);
-        //Empieza try Prepared
-            try(PreparedStatement guardar = conexion.prepareStatement(sql);){
-                guardar.setInt(1, coordenadaX);
-                guardar.setInt(2, coordenadaY);
-                guardar.setInt(3, 1);
-                guardar.setInt(4, 1);
-                guardar.setInt(5, idRepartidor);
-            //Ejecutar update
-                guardar.executeUpdate();
-            //Mostrar mensaje de exito
-                dialogosMensajes.mensajeInformacion("Mensaje informacion", 
-                "Ubicacion guardada exitosamente.");
-            //Guardar ubicacion en una variable statica
-                datosSesionRepartidor.setUbicacion(coordenadaX, coordenadaY);
-            }//Cierra try Prepared
-            conexion.commit();  //Relizar commit
-            validacionUbicacion();
-        }//Finaliza try
+            UPDATE repartidor 
+            SET x_actual = ?, y_actual = ?
+            WHERE id_repartidor = ?
+        """;
+    //Inicia try
+        try(Connection conexion = controladorConector.conectar();
+            PreparedStatement actualizar = conexion.prepareStatement(sql);){
+                actualizar.setDouble(1, ubicacion[0]);
+                actualizar.setDouble(2, ubicacion[1]);
+                actualizar.setInt(3, id);
+            //Ejecutar actualizacion
+                actualizar.executeUpdate();
+        }//Termina try
         catch(SQLException e){
-            if(conexion!=null){
-                try{
-                    conexion.rollback();
-                }
-                catch(SQLException v){
-                    e.addSuppressed(v);
-                }//Termina catch v
-            }
-        }//Termina catch e
-        finally{
-            if(conexion!=null){
-                conexion.close();
-            }
-        }//Termina finally   
+            dialogosMensajes.mensajeError("Informacion error", 
+                "No pudo guardar la ubicacion"
+            );
+        }
+
+        dialogosMensajes.mensajeInformacion("Mensaje informacion", 
+        "Ubicacion activada correctamente.");
     }
 
 //Metodo para desactivar repartidor
@@ -206,7 +198,7 @@ public class ControladorPrincipal {
             SET activo = ?, disponibilidad = ?
             WHERE id_repartidor = ?
                 """;
-        
+    //Inicia try 
         Connection conexion = null;
         try{
             conexion = controladorConector.conectar();
@@ -218,7 +210,7 @@ public class ControladorPrincipal {
 
                 editar.executeUpdate();
             }
-        
+        //Commit a la base da datos
             conexion.commit();
             dialogosMensajes.mensajeInformacion("Mensaje informacion", 
             "Cesion cerrada, hasta luego.");
@@ -250,7 +242,7 @@ public class ControladorPrincipal {
 //Metodo validacionId para mostrar ciertas opciones disponibles o no despues del inicio de sesion
     @FXML 
     private void validacionId(){
-        if(datosSesionRepartidor.getIdRepartidor() == 0){
+        if(datosSesionRepartidor.getIdRepartidor() == null){
             btnIniciar.setVisible(true);
             btnRegistrar.setVisible(true);
             btnActivar.setDisable(true);
@@ -273,14 +265,14 @@ public class ControladorPrincipal {
             txtCoordenadaX.setText(String.valueOf(datosSesionRepartidor.getCoordenadaX()));
             txtCoordenadaY.setText(String.valueOf(datosSesionRepartidor.getCoordenadaY()));
             btnActivar.setDisable(true);
-            txtCoordenadaX.setDisable(true);
-            txtCoordenadaY.setDisable(true);
         }
     }
 
 //Metodo de inicializacion
     @FXML 
     private void initialize(){
+        txtCoordenadaX.setDisable(true);
+        txtCoordenadaY.setDisable(true);
         validacionId();
         validacionUbicacion();
     }

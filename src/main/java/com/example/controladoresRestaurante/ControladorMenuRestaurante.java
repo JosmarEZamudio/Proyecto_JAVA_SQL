@@ -4,6 +4,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.layout.Pane;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Label;
 //Librerias para trabajar con ventanas
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -16,12 +17,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 //Librerias adicionales
 import com.example.controladorConector;
+import com.example.controladorPrincipal;
 import com.example.dialogosMensajes;
 import com.example.controladorSesion.datosSesionRestaurante;
 import java.io.IOException;
 
 
 public class ControladorMenuRestaurante { //Inicio de la clase
+    private controladorPrincipal principal;
 //Objetos de fxml, solo botones
     @FXML 
     private Button btnProducto;
@@ -35,6 +38,8 @@ public class ControladorMenuRestaurante { //Inicio de la clase
     private Button btnHistorial;
     @FXML 
     private Button btnActivar;
+    @FXML 
+    private Label lblUbicacion;
 //Metodo para ir a la interfaz de producto desplegados
     @FXML 
     private void interfazProducto() throws IOException{
@@ -114,9 +119,12 @@ public class ControladorMenuRestaurante { //Inicio de la clase
         try{FXMLLoader loaderPendiente = new FXMLLoader(
             getClass().getResource("/com/example/interfazrestaurante/consultarPedidos.fxml")
             );
-            //Obtener raiz de la interfaz nueva y obtener escena actual
+        //Obtener raiz de la interfaz nueva y obtener escena actual
             Pane pendiente = loaderPendiente.load();
             Scene escenaActual = btnPendiente.getScene();
+        //Pasar referencia del controlador principal
+            ControladorPedidosPendientes controlador = loaderPendiente.getController();
+            controlador.setControladorPrincipal(principal);
             //Obtener scroll de la escena actual y darle la raiz anterior
             ScrollPane contenedor = (ScrollPane) escenaActual.lookup("#contenedorprincipal");
             contenedor.setContent(pendiente);
@@ -124,7 +132,6 @@ public class ControladorMenuRestaurante { //Inicio de la clase
         catch(IOException e){
             dialogosMensajes.mensajeError("Informacion error", 
             "No se puede cargar la interfaz, si el error persiste contactar a soporte.");
-            e.printStackTrace();
             return;
         }   
     }
@@ -148,11 +155,36 @@ public class ControladorMenuRestaurante { //Inicio de la clase
         }   
     }
 
+//Metodo para cerrar la sesion
+    @FXML 
+    private void cerrarSesion() throws IOException{
+    //Cargar archivo fxml
+        FXMLLoader loaderCerrar = new FXMLLoader(
+            getClass().getResource("/com/example/saludoInicial.fxml")
+        );
+    //Obtener pane del archivo fxml (pane es raiz tambien en ese archivo)
+        Pane cerrar = loaderCerrar.load();
+        Scene escenaActual = btnHistorial.getScene();
+    //Obtener Scroll pane actual y psasarle el pane
+        ScrollPane contenedor = (ScrollPane) escenaActual.lookup("#contenedorprincipal");
+        contenedor.setContent(cerrar);
+
+    //Si se inicio sesion con restaurante inicializar valores en nulo
+        if(datosSesionRestaurante.getIdRestaurante()!=null){
+        //Id y nombre restaurante
+            datosSesionRestaurante.iniciar(null, null);
+        //Coordenadas y direccion
+            datosSesionRestaurante.guardarUbicacion(null, null, null);
+            return;
+        }
+
+    }
+
 //Metodo para ir a la interfaz de ubicacion
     @FXML
     private void ubicacion() throws IOException{
         FXMLLoader loaderUbicacion = new FXMLLoader(
-            getClass().getResource("/com/example/interfazrestaurante/interfazUbicacion.fxml")
+            getClass().getResource("/com/example/pruebaUbicacion.fxml")
         );
 
         Scene ubicacion = new Scene(loaderUbicacion.load());
@@ -161,6 +193,16 @@ public class ControladorMenuRestaurante { //Inicio de la clase
         ventanaNueva.setTitle("Guardar ubicacion");
         ventanaNueva.initModality(Modality.APPLICATION_MODAL);
         ventanaNueva.setScene(ubicacion);
+        ventanaNueva.setOnHidden(
+            event ->{
+                try{
+                    mostrarUbicacion();
+                }
+                catch(SQLException e){
+
+                }
+            }
+        );
         ventanaNueva.showAndWait();
 
     }
@@ -188,8 +230,8 @@ public class ControladorMenuRestaurante { //Inicio de la clase
 //Metodo que consulta la cantidad de pedidos, si es cero inhabilitar btnHistorial y btnPendiente
     private int cantidadPedidos () throws SQLException{
     //Obtener id_restaurante e inicializar variable de retorno
-        int id = datosSesionRestaurante.getIdRestaurante();
-        int valor = 0;
+        Integer id = datosSesionRestaurante.getIdRestaurante();
+        Integer valor = null;
     //Setencia sql     
         String sql = "SELECT COUNT(detallePedido.id_pedido) AS cantidad FROM detallePedido JOIN producto "
         +"ON detallePedido.id_producto = producto.id_producto "
@@ -210,20 +252,66 @@ public class ControladorMenuRestaurante { //Inicio de la clase
         return 0;
     }
 
+//Metodo para desplegar ubicacion
+    public void mostrarUbicacion() throws SQLException{
+    //Variables donde se guardaran los datos de direccion
+        String direccion = null;
+        Double longitud = null;
+        Double latitud = null;
+    //Obtener datos para realizar consultas
+        Integer idRestaurante = datosSesionRestaurante.getIdRestaurante();
+    //Segunda setencia sql
+        String sqlUbicacion = """
+            SELECT direccion,coordenada_y,coordenada_x
+            FROM ubicacion
+            WHERE id_restaurante = ? AND activo = ?
+            """;
+        //Segunda consulta
+        try(Connection conexion = controladorConector.conectar();
+            PreparedStatement consultarUbicacion = conexion.prepareStatement(sqlUbicacion)){
+           
+            consultarUbicacion.setInt(1, idRestaurante);
+            consultarUbicacion.setInt(2,1);
+            try(ResultSet resultado = consultarUbicacion.executeQuery();){
+                if(resultado.next()){
+                    direccion = resultado.getString(1);
+                    longitud = resultado.getDouble(2);
+                    latitud = resultado.getDouble(3);
+                }
+            }//Cierra try Prepared
+        }//Cierra try Result
+        //Termina segunda consulta
+    //Validar si las variables obtuvieron un valor
+        if(direccion!=null && latitud != null && longitud != null){
+            datosSesionRestaurante.guardarUbicacion(latitud, longitud, direccion);
+            lblUbicacion.setText(direccion);
+        }
+    }
+
+//Metodo para setear controlador pasado
+    public void setControladorPrincipal(controladorPrincipal principal) {
+        System.out.println("Setter del menú recibió: " + principal);
+        this.principal = principal;
+    }
+
 //Metodo de inicializacion 
     @FXML 
     private void initialize() throws SQLException{
+    //Mensaje en label
+        lblUbicacion.setText("Seleccione una ubicacion.");
     //Si el metodo cantidadPedidos retorna 0, entonces:  
-    try{
-        if(cantidadPedidos()==0){
-            
-            btnPendiente.setDisable(true);
-            btnHistorial.setDisable(true);
-        }
-        }catch(SQLException e){
-            e.printStackTrace();
-            return;
-        }
+        try{
+            mostrarUbicacion();
+            if(cantidadPedidos()==0){
+                
+                btnPendiente.setDisable(true);
+                btnHistorial.setDisable(true);
+            }
+            }catch(SQLException e){
+                dialogosMensajes.mensajeError("Mensaje error", 
+                "No se pudo realizar la consulta.");
+                return;
+            }
     }
 
 }//Fin de la clase

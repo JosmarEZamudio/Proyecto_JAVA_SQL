@@ -19,6 +19,7 @@
         <items>
           <MenuItem fx:id="mniInformacion" mnemonicParsing="false" onAction="#interfazInformacion" text="Informacion Personal" />
           <MenuItem fx:id="mniHistorial" mnemonicParsing="false" onAction="#interfazHistorial" text="Historial de pedido" />
+            <MenuItem fx:id="mniSesion" mnemonicParsing="false" onAction="#cerrarSesion" text="Cerrar Sesion" />
         </items>
       </MenuButton>
       <ScrollPane fx:id="scpProducto" layoutX="20.0" layoutY="133.0" prefHeight="200.0" prefWidth="476.0">
@@ -45,9 +46,9 @@
          </children>
       </Pane>
       <Label fx:id="lblMensaje" layoutX="157.0" layoutY="346.0" text="Active su ubicacion antes de ordenar!!" />
-      <Label fx:id="lblUbicacion" layoutX="73.0" layoutY="373.0" text="Ubicacion activada. " />
-      <Label fx:id="lblCoordenadaX" layoutX="200.0" layoutY="373.0" prefHeight="17.0" prefWidth="105.0" text="Coordenada X:   " />
-      <Label fx:id="lblCoordenadaY" layoutX="328.0" layoutY="373.0" prefHeight="17.0" prefWidth="105.0" text="Coordenada Y:   " />
+      <Label fx:id="lblUbicacion" layoutX="20.0" layoutY="373.0" text="Ubicacion activada. " />
       <Button fx:id="btnUbicacion" layoutX="410.0" layoutY="66.0" mnemonicParsing="false" onAction="#cargarInterfazUbicacion" prefHeight="25.0" prefWidth="82.0" text="Ubicacion" />
+      <Label fx:id="lblUbicacionNombre" layoutX="143.0" layoutY="364.0" prefHeight="37.0" prefWidth="349.0" text="Ubicacion nombre" wrapText="true" />
+      <Label layoutX="54.0" layoutY="103.0" text="Puede ordenar a traves de la aplicacion o puede comunicarse con el negocio." />
    </children>
 </Pane>

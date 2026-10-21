@@ -208,6 +208,7 @@ public class ControladorCompraProducto {
             Stage ventanaNueva = new Stage();
             ventanaNueva.setTitle("Detalle pedido");
             ventanaNueva.setScene(escenaNueva);
+            ventanaNueva.setResizable(false);
             ventanaNueva.show();
         }catch(IOException e){
             dialogosMensajes.mensajeError("Informacion error", 
@@ -225,7 +226,10 @@ public class ControladorCompraProducto {
         LocalDate fecha = LocalDate.now();
         int idPedido;
     //Sentencia sql
-        String sql = "INSERT INTO pedido(id_cliente,estado,fecha) VALUES(?,?,?)";
+        String sql = """
+            INSERT INTO pedido(id_cliente,estado,fecha,id_ubicacionCliente) 
+            VALUES(?,?,?,?)
+        """;
         Connection conexion = null;
     //Abrir primer try Connection y Prepared
         try{
@@ -236,6 +240,7 @@ public class ControladorCompraProducto {
                 agregar.setInt(1, idCliente);
                 agregar.setInt(2, estado);
                 agregar.setDate(3,java.sql.Date.valueOf(fecha)); 
+                agregar.setInt(4, datosSesionCliente.getIdubicacion());
                 agregar.executeUpdate();
             //Empieza segundo try
                 try(ResultSet resultado = agregar.getGeneratedKeys();){

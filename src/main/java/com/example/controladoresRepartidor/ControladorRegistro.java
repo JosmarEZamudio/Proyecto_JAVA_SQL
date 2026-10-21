@@ -3,6 +3,8 @@ package com.example.controladoresRepartidor;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
 import javafx.scene.control.ScrollPane;
 //Librerias de sql
@@ -50,7 +52,7 @@ public class ControladorRegistro {
         if(txtNombre.getText().isBlank() || txtApellidoPaterno.getText().isBlank() ||
             txtApellidoMaterno.getText().isEmpty() || txtPassword.getText().isBlank()){
                 dialogosMensajes.mensajeInformacion("Mensaje informacion", 
-                "Todos lso datos son requeridos.");
+                "Todos los datos son requeridos.");
                 return;
         }
     //Obtener datos personas de txt
@@ -116,8 +118,24 @@ public class ControladorRegistro {
 //Metodo para el boton cancelar
     @FXML 
     private void cancelar() throws IOException{
-        Scene escenaActual = btnCancelar.getScene();
-        interfazPrincipal(escenaActual);
+        try{
+            Scene escenaActual = btnCancelar.getScene();
+            interfazPrincipal(escenaActual);
+        }
+        catch(IOException e){
+            dialogosMensajes.mensajeError("Informacion error", 
+            "No se pudo cargar la interfaz.");
+            return;
+        }
+    }
+
+//Metodo para registrar por medio de boton
+    @FXML 
+    private void registrarPressed(KeyEvent event) throws SQLException{
+        if(event.getCode()==KeyCode.ENTER){
+            registrar();
+        }
+
     }
 
 
@@ -125,14 +143,21 @@ public class ControladorRegistro {
     @FXML 
     private void interfazPrincipal(Scene escenaActual) throws IOException{
     //Cargar archivo fxml
-        FXMLLoader loaderRepartidor = new FXMLLoader(
-            getClass().getResource("/com/example/interfazrepartidor/interfazPrincipal.fxml")
-        );
+        try{
+            FXMLLoader loaderRepartidor = new FXMLLoader(
+                getClass().getResource("/com/example/interfazrepartidor/interfazPrincipal.fxml")
+            );
     //Cargar raiz y encontrar la escena actual
-        Pane repartidor = loaderRepartidor.load();
+            Pane repartidor = loaderRepartidor.load();
     //Encontrar contenedor y setear contenido
-        ScrollPane contenedor = (ScrollPane) escenaActual.lookup("#contenedorprincipal");
-        contenedor.setContent(repartidor);
+            ScrollPane contenedor = (ScrollPane) escenaActual.lookup("#contenedorprincipal");
+            contenedor.setContent(repartidor);
+        }
+        catch(IOException e){
+            dialogosMensajes.mensajeError("Informacion error", 
+            "No se pudo cargar la interfaz.");
+            return;
+        }
     }
 
     

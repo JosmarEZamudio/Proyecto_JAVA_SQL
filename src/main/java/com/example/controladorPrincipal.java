@@ -6,13 +6,24 @@ import javafx.scene.layout.Pane;
 import javafx.scene.control.ScrollPane;
 //Librerias para trabajar con ventanas
 import javafx.fxml.FXMLLoader;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
-//Librerias adicionales
+import javafx.scene.Scene;
+//Librerias,clases adicionales
 import java.io.IOException;
+import java.sql.SQLException;
+
+import com.example.controladorSesion.ControladorInicioSesion;
+import com.example.controladoresSimulacion.ControladorSeguimiento;
+import com.example.controladoresSimulacion.ControladorSimulacion;
 
 public class controladorPrincipal {
 //Objeto dialogos
     dialogosMensajes dialogos = new dialogosMensajes();
+//Instancia de simulacion 
+    private final ControladorSimulacion simulacion = new ControladorSimulacion();
+    private ControladorSeguimiento seguimientoActual;
+    private controladorPrincipal principal;
 //Botones
     @FXML 
     private Button btnSesion;
@@ -36,57 +47,79 @@ public class controladorPrincipal {
     @FXML 
     private ScrollPane contenedorPrincipal;
 
-//Metodo restaurante
+//Metodo para mostrar interfaz de registrar cliente
     @FXML
     private void registroUsuario() throws Exception{
+    //Cargar archivo fxml
         FXMLLoader loaderRegistroCliente = new FXMLLoader(
             getClass().getResource("/com/example/interfazsesion/interfazRegistroCliente.fxml")
         );
-        //El.fxml tiene de raiz un contenedor Pane, por lo tanto: 
-        Pane registro = loaderRegistroCliente.load(); //Se puede obtener directamente su Pane
-        contenedorPrincipal.setContent(registro); //Y despues ajustar el contenido a ScrollPane
+    //Cargar raiz pane 
+        Pane registro = loaderRegistroCliente.load(); 
+    //Setear contenedor
+        contenedorPrincipal.setContent(registro); 
     }
-//Metodo para registrar negocio  
+//Metodo para mostrar interfaz registro negocio  
     @FXML
     private void registroNegocio() throws Exception{
+    //Cagar archivo fxml
         FXMLLoader loaderRegistroNegocio = new FXMLLoader(
             getClass().getResource("/com/example/interfazsesion/interfazRegistroRestaurante.fxml")
         );
+    //Obtener raiz pane
         Pane registro = loaderRegistroNegocio.load();
+    //Setear contenedor
         contenedorPrincipal.setContent(registro);
     }
-//Metodo para inciar sesion
+//Metodo para mostrar interfaz de inicio sesion
     @FXML 
     private void iniciarSesion() throws Exception{
+    //Cargar archivo fxml
         FXMLLoader loaderSesion = new FXMLLoader(
             getClass().getResource("/com/example/interfazsesion/iniciarSesion.fxml")
         );
-    Pane sesion = loaderSesion.load();
-    contenedorPrincipal.setContent(sesion); 
+    //Cargar raiz pane
+        Pane sesion = loaderSesion.load();
+    //Obtener controlador del fxml
+        ControladorInicioSesion controlador = loaderSesion.getController();
+        controlador.setControladorPrincipal(this);
+    //Setear contenedor
+        contenedorPrincipal.setContent(sesion); 
     }
 
-//Metodo para ver las opciones de restaurante 
+//Metodo para mostrar interfaz del menu restaurante
     @FXML 
     private void opcionesRestaurante() throws Exception{
+    //Cagar archivo fxml
         FXMLLoader loaderRestaurante = new FXMLLoader(
             getClass().getResource("/com/example/interfazrestaurante/menuPrincipal.fxml")
         );
-    
-    Pane menu = loaderRestaurante.load();
-    contenedorPrincipal.setContent(menu);
+    //Obtener raiz pane
+        Pane menu = loaderRestaurante.load();
+    //Setear contenedor
+        contenedorPrincipal.setContent(menu);
     }
 
-//Metodo para ver la simulacion
+//Metodo para ir a la interfaz simulacion
     @FXML 
     private void simulacion() throws IOException{
+    //Si se sale de la interfaz, crear un nuevo objeto visual
+        ControladorSeguimiento anterior = seguimientoActual;
+        if (anterior != null) {
+            anterior.detenerActualizacion();
+        }
     //Cargar archivo fxml
         try{
             FXMLLoader loaderSimulacion = new FXMLLoader(
                 getClass().getResource("/com/example/interfazsimulacion/interfaz.fxml")
             );
     //Obtener raiz y setear contenedor
-            Pane simulacion = loaderSimulacion.load();
-            contenedorPrincipal.setContent(simulacion);
+            Pane interfaz = loaderSimulacion.load();
+
+            ControladorSeguimiento controlador = loaderSimulacion.getController();
+            controlador.setSimulacion(simulacion);
+
+            contenedorPrincipal.setContent(interfaz);
         }
         catch(IOException e){
             dialogosMensajes.mensajeError("Informacion error", 
@@ -94,40 +127,96 @@ public class controladorPrincipal {
         }
     }
 
+//Metodo para ir a la interfaz de cargar mapa
+    @FXML 
+    private void cargarMapa() throws IOException{
+    //Si se sale de la interfaz, crear un nuevo objeto visual
+        ControladorSeguimiento anterior = seguimientoActual;
+        if (anterior != null) {
+            anterior.detenerActualizacion();
+        }
+    //Cargar archivo fxml
+        try{
+            FXMLLoader loaderSimulacion = new FXMLLoader(
+                getClass().getResource("/com/example/pruebaUbicacion.fxml")
+            );
+    //Obtener raiz y setear contenedor
+            Scene escenaNueva = new Scene(loaderSimulacion.load());
+            Stage nuevaVentana = new Stage();
+
+            nuevaVentana.setTitle("Ubicacion");
+            nuevaVentana.setScene(escenaNueva);
+            nuevaVentana.initModality(Modality.APPLICATION_MODAL);
+            nuevaVentana.showAndWait();
+
+        }
+        catch(IOException e){
+            dialogosMensajes.mensajeError("Informacion error", 
+            "No se pudo cargar la interfaz.");
+            e.printStackTrace();
+        }
+    }
 
 //Metodo para salir
     @FXML 
     private void salir(){
+    //Obtener ventana actual y cerrar
         Stage ventanaActual = (Stage) btnSalir.getScene().getWindow();
-        ventanaActual.close();
-    }
-    
-    public Pane contenedorPane(){
-        return contenedorSaludo;
+    //Guardar valor de retorno
+        Boolean resultado = dialogosMensajes.mensajeConfirmacion( "Mensaje confirmacion", 
+        "Guarde cambios para salir");
+    //Validar valor de retorno
+        if(resultado == true){
+            //Obtener ventana actual y cerrar
+                ventanaActual.close();
+        }
 
     }
 
 //Metodo para ver la interfaz del repartidor
     @FXML 
     private void interfazRepartidor() throws IOException{
+    //Cargar archivo fxml
         FXMLLoader loaderRepartidor = new FXMLLoader(
             getClass().getResource("/com/example/interfazrepartidor/interfazPrincipal.fxml")
         );
-
+    //Obtener raiz pane
         Pane repartidor = loaderRepartidor.load();
+    //Setear contenedor 
         contenedorPrincipal.setContent(repartidor);
     }
 
 //*****Metodo iniciales********* 
+//Metodo para mostrar la interfaz de saludo
     @FXML 
     private void saludoInicial() throws Exception{
+    //Cargar archivo fxml
         FXMLLoader loaderSaludo = new FXMLLoader(
             getClass().getResource("saludoInicial.fxml")
         );
-    Pane saludo = loaderSaludo.load();
-    contenedorPrincipal.setContent(saludo);
+    //Cargar raiz pane
+        Pane saludo = loaderSaludo.load();
+    //Setear contenedor
+        contenedorPrincipal.setContent(saludo);
     }
-//Metodo para incicializar cosas empezando la aplicacion
+
+//Metodo para acceder a la simulacion 
+    public void iniciarSimulacion() throws SQLException{
+        try{
+            simulacion.simulacionMovimiento();
+        }
+        catch(SQLException e){
+            dialogosMensajes.mensajeError("Mensaje error", 
+            "No se pudo cambiar de estado.");
+        }
+    }
+//Metodo para asginar controlador 
+    public void setControladorPrincipal(controladorPrincipal principal) {
+         System.out.println("Setter del menú recibió: " + principal);
+        this.principal = principal;
+    }
+
+//Metodo de inicializacion
     @FXML 
     public void initialize() throws Exception{ 
         saludoInicial();

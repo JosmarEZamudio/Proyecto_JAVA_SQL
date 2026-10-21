@@ -2,13 +2,13 @@ package com.example.controladorSesion;
 
 public class datosSesionRepartidor {
 
-    public static int idRepartidor = 0;
+    public static Integer idRepartidor = null;
     public static String nombreRepartidor;
 
     public static Integer coordenadaX = null;
     public static Integer coordenadaY = null;
 //Metodos de asignacion
-    public static void setRepartidor(int id, String nombre){
+    public static void setRepartidor(Integer id, String nombre){
         idRepartidor = id;
         nombreRepartidor = nombre;
     }
@@ -19,7 +19,7 @@ public class datosSesionRepartidor {
     }
 
 //Metodos de retorno
-    public static int getIdRepartidor(){
+    public static Integer getIdRepartidor(){
         return idRepartidor;
     }
 

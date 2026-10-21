@@ -2,63 +2,75 @@ package com.example.controladoresSimulacion;
 
 public class ControladorUbicaciones {
 //Id del pedido
-    public static int idPedido;
+    public static Integer idPedido;
 //Coordenadas de la direccion del negocio
-    public static double coordenadaXNegocio;
-    public static double coordenadaYNegocio;
+    public static Double coordenadaXNegocio;
+    public static Double coordenadaYNegocio;
+    public static String direccionNegocio;
 //Coordenadas de la ubicacion del repartidor
-    public static double coordenadaXRepartidor;
-    public static double coordenadaYRepartidor;
+    public static Double coordenadaXRepartidor;
+    public static Double coordenadaYRepartidor;
 //Coordenadas de la ubicacion del cliente
-    public static double coordenadaXCliente;
-    public static double coordenadaYCliente;
+    public static Double coordenadaXCliente;
+    public static Double coordenadaYCliente;
+    public static String direccionCliente;
 
 //Metodos para setear ubicaciones 
-    public static void setIdPedido(int id){
+    public static void setIdPedido(Integer id){
         idPedido = id;
     }
 
-    public static void setUbicacionNegocio(int x, int y){
-        coordenadaXNegocio = (double) x;
-        coordenadaYNegocio = (double) y;
+    public static void setUbicacionNegocio(Double x, Double y,String nombre){
+        coordenadaXNegocio =  x;
+        coordenadaYNegocio =  y;
+        direccionNegocio = nombre;
     }
     
-    public static void setUbicacionCliente(int x, int y){
-        coordenadaXCliente = (double) x;
-        coordenadaYCliente = (double) y;
+    public static void setUbicacionCliente(Double x, Double y, String nombre){
+        coordenadaXCliente =  x;
+        coordenadaYCliente =  y;
+        direccionCliente = nombre;
     }
 
-    public static void setUbicacionRepartidor(int x, int y){
-        coordenadaXRepartidor = (double) x;
-        coordenadaYRepartidor = (double) y;
+    public static void setUbicacionRepartidor(Double x, Double y){
+        coordenadaXRepartidor =  x;
+        coordenadaYRepartidor =  y;
     }
 
 //Metodos de retorno de variables
-    public static int getIdPedido(){
+    public static Integer getIdPedido(){
         return idPedido;
     }
-
-    public static double getCoordenadaXNegocio(){
+//*******Negocio */
+    public static Double getCoordenadaXNegocio(){
         return coordenadaXNegocio;
     }
 
-    public static double getCoordenadaYNegocio(){
+    public static Double getCoordenadaYNegocio(){
         return coordenadaYNegocio;
     }
 
-    public static double getCoordenadaXCliente(){
+    public static String getDireccionNegocio(){
+        return direccionNegocio;
+    }
+//*******Cliente */
+    public static Double getCoordenadaXCliente(){
         return coordenadaXCliente;
     }
 
-    public static double getCoordenadaYCliente(){
+    public static Double getCoordenadaYCliente(){
         return coordenadaYCliente;
     }
-
-    public static double getCoordenadaXRepartidor(){
+    
+    public static String getDireccionCliente(){
+        return direccionCliente;
+    }
+//*****Repartidor */
+    public static Double getCoordenadaXRepartidor(){
         return coordenadaXRepartidor;
     }
 
-    public static double getCoordenadaYRepartidor(){
+    public static Double getCoordenadaYRepartidor(){
         return coordenadaYRepartidor;
     }
 

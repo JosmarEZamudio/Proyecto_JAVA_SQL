@@ -3,6 +3,8 @@ package com.example.controladorSesion;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
 import javafx.scene.control.ScrollPane;
 //Componetes para la interfaz
@@ -15,10 +17,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 //Funciones adicionales
 import com.example.controladorConector;
+import com.example.controladorPrincipal;
 import com.example.dialogosMensajes;
+import com.example.controladoresRestaurante.ControladorMenuRestaurante;
+
 import java.io.IOException;
 
 public class ControladorInicioSesion {
+//Declarar clase
+    private controladorPrincipal principal;
 //Objetos botones
     @FXML 
     private Button btnIngresarCliente;
@@ -39,15 +46,15 @@ public class ControladorInicioSesion {
         String usuario = txtUsuario.getText();
         String password = txtPassword.getText();
         Scene escenaActual = btnIngresarCliente.getScene();
-
+    //Validar txt en blanco
         if (txtUsuario.getText().isBlank() ||
             txtPassword.getText().isBlank()){
                 dialogosMensajes.mensajeInformacion("Informacion", "¡¡Ingresar ambos datos!!");
                 return;
         }
-
+    //Setencia sql
         String sql = "SELECT id_cliente,nombre FROM cliente WHERE correo = ? AND contrasena = ?";
-
+    //Empieza try Connection y Prepared
         try(Connection conexion = controladorConector.conectar();
             PreparedStatement consultar = conexion.prepareStatement(sql);){
                 consultar.setString(1, usuario);
@@ -78,6 +85,7 @@ public class ControladorInicioSesion {
             return;
         }
     }
+
 //Metodo para iniciar sesion como negocio
     @FXML 
     private void inicioSesionRestaurante() throws SQLException{
@@ -93,7 +101,7 @@ public class ControladorInicioSesion {
         }
     //Cadena de consulta
         String sql = """
-            SELECT id_restaurante,nombre,coordenada_x,coordenada_y
+            SELECT id_restaurante,nombre
             FROM restaurante 
             WHERE correo = ? AND contrasena = ?
                 """;
@@ -102,15 +110,13 @@ public class ControladorInicioSesion {
             PreparedStatement consultar = conexion.prepareStatement(sql);){
             consultar.setString(1, usuario);
             consultar.setString(2, password);
+        //Inicia try ResultSet
             try(ResultSet resultado = consultar.executeQuery();){
             //Obtener resultados de la consulta
                 if(resultado.next()){
                     int id = resultado.getInt("id_restaurante");
                     String nombre = resultado.getString("nombre");
-                    int coordenadaX = resultado.getInt("coordenada_x");
-                    int coordenadaY = resultado.getInt("coordenada_y");
                     datosSesionRestaurante.iniciar(id,nombre); //*** Pasar datos de sesion
-                    datosSesionRestaurante.guardarUbicacion(coordenadaX, coordenadaY); //Pasar datos de la ubicacion
                     dialogosMensajes.mensajeInformacion("Informacion sesion", 
                         "Negocio encontrado, bienvenido."
                     );
@@ -134,7 +140,7 @@ public class ControladorInicioSesion {
         }
     }
 
-//Metodo para cancelar y regresar al saludo
+//Metodo para cancelar y mostrar interfaz saludo
     @FXML 
     private void cancelar() throws IOException{
         try{
@@ -162,6 +168,10 @@ public class ControladorInicioSesion {
             );
         //Obtener pane del archivo fxml
         Pane menu = loaderMenu.load();
+        //Asignar controlador 
+        ControladorMenuRestaurante controlador = loaderMenu.getController();
+        controlador.setControladorPrincipal(principal);
+
         //Pasar escena actual como parametro, no es necesario volver a buscarla
         ScrollPane contenedor = (ScrollPane) escenaActual.lookup("#contenedorprincipal");
         contenedor.setContent(menu);
@@ -181,5 +191,28 @@ public class ControladorInicioSesion {
         contenedor.setContent(menu);
     }
 
+//Metodo para iniciar sesion como cliente por medio de presionar tecla enter
+    @FXML 
+    private void iniciarSesionPressed(KeyEvent event) throws SQLException{
+    //validar boton presionado: entra como cliente
+        if(event.getCode()==KeyCode.ENTER){
+            inicioSesionCliente();
+            return;
+        }
+    //Validar boton presionado: entra como restaurante
+        if(event.getCode()==KeyCode.P){
+            inicioSesionRestaurante();
+            return;
+        }
+    }
+
+//Recibir controlador principal del controlador controladorPrincipal
+    public void setControladorPrincipal(controladorPrincipal principal){
+        System.out.println("Setter del menú recibió: " + principal);
+        this.principal = principal;
+    }
+
+//Metodo initialize
+    //Metodo initialize no utilizado
 }
 

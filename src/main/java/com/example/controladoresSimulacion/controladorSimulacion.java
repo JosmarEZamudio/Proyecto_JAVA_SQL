@@ -1,124 +1,265 @@
 package com.example.controladoresSimulacion;
-//Librerias para fxml
-import javafx.fxml.FXML;
-import javafx.scene.control.TextField;
 //Librerias para la simulacion de movimiento
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.util.Duration;
 //Librerias, clases adicionales
-import com.example.controladorSesion.datosSesionRepartidor;
+import java.util.Random;
+import com.example.controladorConector;
+import com.example.dialogosMensajes;
 
-public class controladorSimulacion {
-//Objetos de fxml
-    @FXML 
-    private TextField txtPosicion;
-    @FXML 
-    private TextField txtMovimiento;
-    @FXML 
-    private TextField txtDestino;
-    @FXML 
-    private TextField txtEstado;
-    @FXML 
-    private TextField txtDistancia;
-    @FXML 
-    private TextField txtTiempo;
-//Variables para todos los metodos
+//Librerias sql 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+public class ControladorSimulacion {
+
     //Coordenadas del repartidor
-        private double coordenadaXRepartidor;
-        private double coordenadaYRepartidor;
+        private Double coordenadaXRepartidor;
+        private Double coordenadaYRepartidor;
     //Coordenadas del restaurante
-        double coordenadaXDestino = 23;
-        double coordenadaYDestino = 21;
+        private Double coordenadaXNegocio;
+        private Double coordenadaYNegocio;
+    //Coordenadas del cliente
+        private Double coordenadaXCliente;
+        private Double coordenadaYCliente;
+    //Coordenadas a las que debe ir
+        private Double coordenadaXDestino;
+        private Double coordenadaYDestino;
     //Distancia recorrida y velocidad
-        double distanciaRecorrida = 0;
-        double velocidad = 7;
+        private Double distanciaRecorrida;
+        private Double velocidad = (double) 600;
     //Tiempos y repeticiones
-        Timeline simulacion;
+        private String estado = "Inactivo";
+        private Timeline simulacion;
         private long tiempoInicio;
-        double tiempoTranscurrido;
+    //Variables de simulacion de espera
+        private boolean esperando = false;
+        private long tiempoFinal;
+        private final Random random = new Random();
 
 //Metodo para simular movimiento del repartidor
-    @FXML 
-    private void simulacionMovimiento(){
-
-        tiempoInicio = System.nanoTime();
-
-        coordenadaXRepartidor = datosSesionRepartidor.getCoordenadaX();
-        coordenadaYRepartidor = datosSesionRepartidor.getCoordenadaY();
-
-        txtPosicion.setText(String.valueOf(coordenadaXRepartidor+" , "+coordenadaYRepartidor));
-
+    public void simulacionMovimiento() throws SQLException{
+    //Evita duplicar simulaciones
+        if(simulacion != null){
+            simulacion.stop();
+        }
+    //Iniciar tiempo
+        this.tiempoInicio = System.nanoTime();
+    //Ubicacion del repartidor
+        this.coordenadaXRepartidor = ControladorUbicaciones.getCoordenadaYRepartidor();
+        this.coordenadaYRepartidor = ControladorUbicaciones.getCoordenadaXRepartidor();
+    //Ubicacion del negocio
+        this.coordenadaXNegocio = ControladorUbicaciones.getCoordenadaXNegocio();
+        this.coordenadaYNegocio = ControladorUbicaciones.getCoordenadaYNegocio();
+    //Ubicacion del clietne
+        this.coordenadaXCliente = ControladorUbicaciones.getCoordenadaXCliente();
+        this.coordenadaYCliente = ControladorUbicaciones.getCoordenadaYCliente();
+    //Ubicacion del destino al cual debe dirigirse, puede ser aun destino (negocio o cliente)
+        this.coordenadaXDestino = coordenadaXNegocio;
+        this.coordenadaYDestino = coordenadaYNegocio;
+    //Asignar estado del pedido y valor a la distancia recorrida
+        this.distanciaRecorrida = (double) 0;
+        this.estado = "En camino al negocio";
+    //Cambiar estado
+            cambiarEstado(2);
+    //Inicia simulacion
         simulacion = new Timeline(
             new KeyFrame(Duration.millis(100), e->{
-                movimiento();
-                imprimir();
+                try{
+                    movimiento();         
+                }
+                catch(SQLException v){
+                    dialogosMensajes.mensajeError("Mensaje informacion", 
+                    "No se pudo realizar los cambios de estado.");
+                    simulacion.stop();
+                    return;
+                }
             })
         );
 
         simulacion.setCycleCount(Animation.INDEFINITE);
         simulacion.play();
+
     }
 
-//Metodo para realizar el movimiento 
-    @FXML 
-    private void movimiento(){
-        double dx = coordenadaXDestino - coordenadaXRepartidor ;
-        double dy = coordenadaYDestino - coordenadaYRepartidor;
+ // Metodo para calcular el movimiento del repartidor
+ // Coordenadas X = longitud, Y = latitud
+    private void movimiento() throws SQLException{
 
-        double distancia = Math.sqrt(dx*dx+dy*dy);
-        double avance = velocidad * 0.1;
+        if (esperando) {
+            if (System.nanoTime() < tiempoFinal) {
+                return;
+            }
+            esperando = false;
+        }
 
-        if (distancia <= avance || distancia == 0){
+        double latitudActual = coordenadaXRepartidor;
+        double longitudActual = coordenadaYRepartidor;
+
+        double latitudDestino = coordenadaXDestino;
+        double longitudDestino = coordenadaYDestino;
+
+        // Distancia real hasta el destino, en kilometros
+        double distancia = ControladorAsignarRepartidor.distanciaHaversine(
+                latitudActual, longitudActual,
+                latitudDestino, longitudDestino
+        );
+
+        // Avance en kilometros por cada 100 milisegundos
+        double avance = velocidad * (0.1 / 3600.0);
+
+        if (distancia <= avance || distancia == 0) {
+
             distanciaRecorrida += distancia;
 
             coordenadaXRepartidor = coordenadaXDestino;
             coordenadaYRepartidor = coordenadaYDestino;
 
-            datosSesionRepartidor.setUbicacion((int)coordenadaXRepartidor,(int)coordenadaYRepartidor);
-            
-            simulacion.stop();
+            if (estado.equals("En camino al negocio")) {
 
-        }else{
-            double movimientoX = (dx/distancia)*avance;
-            double movimientoY = (dy/distancia)*avance;
+                estado = "Esperando en el negocio";
+                try{
+                    cambiarEstado(3);
+                }
+                catch(SQLException e){
+                    throw e;
+                }
+                iniciarEspera();
+        
+            } else if (estado.equals("En camino al cliente")) {
 
-            coordenadaXRepartidor += movimientoX;
-            coordenadaYRepartidor += movimientoY;
+                estado = "Entregando al cliente";
+                iniciarEspera();
+
+            } else if (estado.equals("Esperando en el negocio")) {
+                velocidad = 30.0;
+                coordenadaXDestino = coordenadaXCliente;
+                coordenadaYDestino = coordenadaYCliente;
+
+                estado = "En camino al cliente";
+                try{
+                    cambiarEstado(4);
+                }
+                catch(SQLException e){
+                    throw e;
+                }
+
+            } else if (estado.equals("Entregando al cliente")) {
+                try{
+                    cambiarEstado(5);
+                }
+                catch(SQLException e){
+                    throw e;
+                }
+                estado = "Entrega completada";
+                simulacion.stop();
+                
+            }
+
+        } else {
+            // Calcular direccion hacia el destino
+            double lat1 = Math.toRadians(latitudActual);
+            double lat2 = Math.toRadians(latitudDestino);
+            double lon1 = Math.toRadians(longitudActual);
+            double lon2 = Math.toRadians(longitudDestino);
+
+            double diferenciaLon = lon2 - lon1;
+
+            double y = Math.sin(diferenciaLon) * Math.cos(lat2);
+
+            double x = Math.cos(lat1) * Math.sin(lat2)
+                    - Math.sin(lat1) * Math.cos(lat2)
+                    * Math.cos(diferenciaLon);
+
+            double rumbo = Math.atan2(y, x);
+
+            // Convertir el avance a distancia angular
+            double distanciaAngular = avance / 6371.0;
+
+            // Calcular nueva latitud
+            double nuevaLatitud = Math.asin(
+                    Math.sin(lat1) * Math.cos(distanciaAngular)
+                    + Math.cos(lat1) * Math.sin(distanciaAngular)
+                    * Math.cos(rumbo)
+            );
+
+            // Calcular nueva longitud
+            double nuevaLongitud = lon1 + Math.atan2(
+                    Math.sin(rumbo) * Math.sin(distanciaAngular)
+                    * Math.cos(lat1),
+                    Math.cos(distanciaAngular)
+                    - Math.sin(lat1) * Math.sin(nuevaLatitud)
+            );
+
+            coordenadaXRepartidor = Math.toDegrees(nuevaLatitud);
+            coordenadaYRepartidor = Math.toDegrees(nuevaLongitud);
 
             distanciaRecorrida += avance;
         }
     }
 
-//Metodo para imprimir el movimiento 
-    @FXML
-    private void imprimir(){
-        txtMovimiento.setText(String.format("%.2f , %.2f",coordenadaXRepartidor,coordenadaYRepartidor));
-        txtDestino.setText(String.format("%.2f , %.2f",coordenadaXDestino,coordenadaYDestino));
-        txtDistancia.setText(String.format("%.2f",distanciaRecorrida));
+//Metodo de tiempo de espera aleatorio
+    private void iniciarEspera() {
+        esperando = true;
+    // Entre 30 y 45 segundos, ambos incluidos
+        int segundos = random.nextInt(16) + 30;
+        tiempoFinal = System.nanoTime()
+                + segundos * 1_000_000_000L;
+    }
 
-        tiempoTranscurrido = (System.nanoTime()-tiempoInicio) /1_000_000_000.0 ;
+//Metodos sql para cada cada estado de entrega
+    private void cambiarEstado(int i) throws SQLException{
+    //Setencia sql
+        String sql = """
+            UPDATE pedido 
+            SET estado = ?
+            WHERE id_pedido = ?
+        """;
+    //Try prepared y Connection
+        try(Connection conexion = controladorConector.conectar();
+            PreparedStatement actualizar = conexion.prepareStatement(sql);){
+                actualizar.setInt(1, i);
+                actualizar.setInt(2, ControladorUbicaciones.getIdPedido());
 
-        txtTiempo.setText(String.format("%.2f segundos", tiempoTranscurrido));
+                actualizar.executeUpdate();
+        }
+        catch(SQLException e){
+            //dialogosMensajes.mensajeError("Mensaje error", 
+            //"No se pudieron realizar los cambios de estado.");
+            throw e;
+        }
+    }
+
+//Metodos de retorno
+    public double getXRepartidor(){
+        return coordenadaXRepartidor;
+    }
+
+    public double getYRepartidor(){
+        return coordenadaYRepartidor;
+    }
+      
+    public double getXDestino(){
+        return coordenadaXDestino;
+    }
+
+    public double getYDestino(){
+        return coordenadaYDestino;
+    }
+
+    public double getDistanciaRecorrida(){
+        return distanciaRecorrida;
     }
    
-//Metodo para inhabilitar txt
-    @FXML 
-    private void inhabilitar(){
-        txtPosicion.setDisable(true);
-        txtDestino.setDisable(true);
-        txtEstado.setDisable(true);
-        txtDistancia.setDisable(true);
-        txtTiempo.setDisable(true);
-        txtMovimiento.setDisable(true);
+    public double getTiempoSimulacion(){
+        return (System.nanoTime()-tiempoInicio)/1_000_000_000.00;
     }
 
-//Metodo de inicializacion
-    @FXML 
-    private void initialize(){
-        inhabilitar();
-        simulacionMovimiento();
+    public String getEstado(){
+        return estado;
     }
-
 }
+

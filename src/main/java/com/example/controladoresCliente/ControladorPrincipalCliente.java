@@ -9,6 +9,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
 //Librerias para posiciones
 import javafx.geometry.Pos;
 import javafx.geometry.Insets;
@@ -17,7 +18,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
 //Trabajar con ventanas
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -39,6 +39,8 @@ public class ControladorPrincipalCliente {
     private MenuItem mniHistorial;
     @FXML 
     private GridPane gdpRestaurante;
+    @FXML 
+    private TextField txtBuscar;
 //Objetos label fxml
     @FXML 
     private Label lblAgregado; 
@@ -47,16 +49,16 @@ public class ControladorPrincipalCliente {
     @FXML 
     private Label lblMensaje;
     @FXML 
-    private Label lblCoordenadaX;
-    @FXML 
-    private Label lblCoordenadaY;
-    @FXML 
     private Label lblUbicacion;
+    @FXML 
+    private Label lblUbicacionNombre;
 //Botones fxml
     @FXML 
     private Button btnDetalle;
     @FXML 
     private Button btnOrdenar;
+    @FXML 
+    private Button btnBuscar;
 
 //Metodo para cargar interfaz de informacion    
     @FXML 
@@ -99,19 +101,55 @@ public class ControladorPrincipalCliente {
         }
     }
 
+//Metodo para cerrar sesion 
+    @FXML 
+    private void cerrarSesion() throws IOException{
+    //Cargar archivo fxml
+        FXMLLoader loaderCerrar = new FXMLLoader(
+            getClass().getResource("/com/example/saludoInicial.fxml")
+        );
+    //Obtener raiz y escena
+        Pane cerrar = loaderCerrar.load();
+        Scene escenaActual = mnbOpciones.getScene();
+    //Obtener contenedor y seteae
+        ScrollPane contenedor = (ScrollPane) escenaActual.lookup("#contenedorprincipal");
+        contenedor.setContent(cerrar);
+    //Si se inicio sesion con cliente inicializar valores en nulods
+        if(datosSesionCliente.getIdCliente()!=null){
+        //Id y nombre cliente
+            datosSesionCliente.iniciar(null, null);
+        //Coordenadas y direccion
+            datosSesionCliente.ubicacion(null, null, null);
+            return;
+        }
+    
+    }
 //Consultar negocios existentes
     @FXML 
     private void consultarNegocios() throws SQLException{
-    int columna = 0;  
+        int columna = 0;  
     //Inicializacion de variables donde se guardar los resultados de la consulta
-    int idRestaurante;
-    String nombre;
-    String telefono;
+        int idRestaurante;
+        String nombre;
+        String telefono;
     //Sentencia sql
-        String sql = "SELECT id_restaurante,nombre,telefono FROM restaurante";
+        String sql = """
+            SELECT restaurante.id_restaurante,restaurante.nombre,restaurante.telefono,
+                ST_Distance_Sphere(
+                    POINT(ubicacion.coordenada_y, ubicacion.coordenada_x),
+                    POINT(-100.3673021, 25.8397959)
+                ) AS distancia_metros
+            FROM restaurante JOIN ubicacion
+            ON restaurante.id_restaurante = ubicacion.id_restaurante
+            WHERE ST_Distance_Sphere(
+                POINT(ubicacion.coordenada_y, ubicacion.coordenada_x),
+                POINT(-100.3673021, 25.8397959)
+            ) <= 7000 AND activo = 1;
+        """; 
     //Primer try Connection y Prepared
         try(Connection conexion = controladorConector.conectar();
             PreparedStatement consultar = conexion.prepareStatement(sql)){
+            //Try resultSet
                 try(ResultSet resultado = consultar.executeQuery();){
                     while(resultado.next()){
                         idRestaurante = resultado.getInt("id_restaurante");
@@ -206,10 +244,16 @@ public class ControladorPrincipalCliente {
 //Metodo para cargar interfaz de Ubicacion
     @FXML 
     private void cargarInterfazUbicacion() throws IOException{
+    //Validar si existe usuario 
+        if(datosSesionCliente.getIdCliente()==null){
+            dialogosMensajes.mensajeInformacion("Mensaje informacion", 
+            "No existe una sesion!! Inicie sesion");
+        }
+
     //Cargar archivo fxml
         try{
         FXMLLoader loaderUbicacion = new FXMLLoader(
-            getClass().getResource("/com/example/interfazcliente/interfazUbicacion.fxml")
+            getClass().getResource("/com/example/pruebaUbicacion.fxml")
         );
     //Obtener escena
         Scene escenaNueva = new Scene(loaderUbicacion.load());
@@ -222,6 +266,10 @@ public class ControladorPrincipalCliente {
         nuevaVentana.setOnHidden(c->{
            verificar();
            try{
+                if(datosSesionCliente.getCoordenadaX()==null &&
+                    datosSesionCliente.getCoordenadaY()==null){
+                        return;
+                    }
                 despligue();
            }catch(SQLException e){
                 dialogosMensajes.mensajeError("Informacion error", 
@@ -233,6 +281,7 @@ public class ControladorPrincipalCliente {
         }catch(IOException e){
             dialogosMensajes.mensajeInformacion("Informacion error", 
             "No se pudo cargar la interfaz de ubicacion, intente de nuevo.");
+            e.printStackTrace();
         }
     }
 
@@ -241,12 +290,11 @@ public class ControladorPrincipalCliente {
     private void verificar(){
         if(datosSesionCliente.getCoordenadaX() != null &
             datosSesionCliente.getCoordenadaY() != null){
+                btnBuscar.setDisable(true);
                 lblMensaje.setVisible(false);
                 lblUbicacion.setVisible(true);
-                lblCoordenadaX.setText("Coordenada X: "+datosSesionCliente.getCoordenadaX());
-                lblCoordenadaX.setVisible(true);
-                lblCoordenadaY.setText("Coordenada Y: "+datosSesionCliente.getCoordenadaY());
-                lblCoordenadaY.setVisible(true);
+                lblUbicacionNombre.setVisible(true);
+                lblUbicacionNombre.setText(datosSesionCliente.getNombreUbicacion());
                 return;
             }
     }
@@ -278,7 +326,6 @@ public class ControladorPrincipalCliente {
             mniHistorial.setVisible(true);
         }
     }
-    
 
 //Metodo de inicializacion
     @FXML 
@@ -287,15 +334,15 @@ public class ControladorPrincipalCliente {
         if(datosSesionCliente.getCoordenadaX() == null & 
         datosSesionCliente.getCoordenadaY()==null){
             lblMensaje.setVisible(true);
-            lblCoordenadaX.setVisible(false);
-            lblCoordenadaY.setVisible(false);
             lblUbicacion.setVisible(false);
+            lblUbicacionNombre.setVisible(false);
             btnDetalle.setDisable(true);
             btnOrdenar.setDisable(true);
+            btnBuscar.setDisable(true);
             pnBarra.setVisible(false);
             return;
         }
-
+        verificar();
         despligue();  
     }
 

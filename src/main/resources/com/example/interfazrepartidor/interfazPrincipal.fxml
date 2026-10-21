@@ -10,9 +10,9 @@
 
 <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="466.0" prefWidth="515.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.controladoresRepartidor.ControladorPrincipal">
    <children>
-      <Button fx:id="btnActivar" layoutX="109.0" layoutY="364.0" mnemonicParsing="false" onAction="#guardarUbicacion" prefHeight="25.0" prefWidth="70.0" text="Activar" />
+      <Button fx:id="btnActivar" layoutX="109.0" layoutY="364.0" mnemonicParsing="false" onAction="#generarUbicacion" prefHeight="25.0" prefWidth="70.0" text="Activar" />
       <Button fx:id="btnDesactivar" layoutX="323.0" layoutY="364.0" mnemonicParsing="false" onAction="#desactivar" text="Desactivar" />
-      <Label layoutX="232.0" layoutY="105.0" prefHeight="27.0" prefWidth="79.0" text="Ubicacion">
+      <Label layoutX="178.0" layoutY="105.0" prefHeight="27.0" prefWidth="135.0" text="Ubicacion actual">
          <font>
             <Font size="18.0" />
          </font>
@@ -27,9 +27,10 @@
           <MenuItem fx:id="mniHistorial" mnemonicParsing="false" text="Historial pedidos" />
         </items>
       </MenuButton>
-      <Label fx:id="lblActualX" layoutX="214.0" layoutY="278.0" prefHeight="17.0" prefWidth="149.0" text="Actual X: " />
-      <Label fx:id="lblActualY" layoutX="214.0" layoutY="308.0" prefHeight="17.0" prefWidth="175.0" text="Actual Y: " />
+      <Label fx:id="lblActualX" layoutX="158.0" layoutY="34.0" prefHeight="17.0" prefWidth="149.0" text="Actual X: " />
+      <Label fx:id="lblActualY" layoutX="158.0" layoutY="64.0" prefHeight="17.0" prefWidth="175.0" text="Actual Y: " />
       <Button fx:id="btnIniciar" layoutX="376.0" layoutY="30.0" mnemonicParsing="false" onAction="#iniciar" text="Iniciar sesion" />
       <Button fx:id="btnRegistrar" layoutX="376.0" layoutY="72.0" mnemonicParsing="false" onAction="#registrar" prefHeight="25.0" prefWidth="84.0" text="Registrarse" />
+      <Label layoutX="171.0" layoutY="273.0" text="No ha activado la ubicacion." />
    </children>
 </Pane>

@@ -3,6 +3,8 @@ package com.example.controladoresRepartidor;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.KeyCode;
 //Librerias sql
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -29,19 +31,20 @@ public class ControladorSesionRepartidor {
 //Metodo para iniciar sesion
     @FXML 
     private void iniciarSesion() throws SQLException{
+    //Validar txt en blanco
         if(txtCorreo.getText().isBlank() || txtPassword.getText().isBlank()){
             dialogosMensajes.mensajeInformacion("Mensaje informacion", 
             "Todos los datos son requeridos!!");
             return;
         }
-
+    //Obtener ventana actual
         Stage ventanaActual = (Stage) btnIniciar.getScene().getWindow();
-
+    //Variables de clausulas 
         String correo = txtCorreo.getText();
         String password = txtPassword.getText();
         int id = 0;
         String nombre;
-
+    //Sentencia sql
         String sql = "SELECT id_repartidor,nombre FROM repartidor WHERE correo = ? AND contrasena = ?";
     //Inicia try Connection y Prepared
         try(Connection conexion = controladorConector.conectar();
@@ -72,6 +75,14 @@ public class ControladorSesionRepartidor {
             "No se puede iniciar sesion, intente de nuevo.");
         }
 
+    }
+
+//Metodo para iniciar boton por boton presionado Enter
+    @FXML 
+    private void ingresarPressed(KeyEvent event) throws SQLException{
+        if(event.getCode()==KeyCode.ENTER){
+            iniciarSesion();
+        }
     }
 
 //Metodo para regresar a la ventana principal

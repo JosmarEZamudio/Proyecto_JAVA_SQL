@@ -4,23 +4,24 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.Pane?>
 
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" 
-prefHeight="466.0" prefWidth="515.0" xmlns="http://javafx.com/javafx/26" 
-xmlns:fx="http://javafx.com/fxml/1" 
-fx:controller="com.example.controladoresSimulacion.controladorSimulacion">
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="466.0" prefWidth="515.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.controladoresSimulacion.ControladorSeguimiento">
    <children>
       <Label layoutX="198.0" layoutY="35.0" text="Muestra de simulacion" />
-      <Label layoutX="82.0" layoutY="107.0" text="Posicion actual: " />
-      <TextField fx:id="txtPosicion" layoutX="217.0" layoutY="103.0" />
-      <Label layoutX="61.0" layoutY="200.0" text="Posicion de destino:" />
-      <TextField fx:id="txtDestino" layoutX="217.0" layoutY="196.0" />
-      <Label layoutX="124.0" layoutY="256.0" text="Estado:" />
-      <TextField fx:id="txtEstado" layoutX="217.0" layoutY="252.0" />
-      <Label layoutX="118.0" layoutY="308.0" text="Distancia:" />
-      <TextField fx:id="txtDistancia" layoutX="217.0" layoutY="304.0" />
-      <Label layoutX="122.0" layoutY="362.0" text="Tiempo:" />
-      <TextField fx:id="txtTiempo" layoutX="217.0" layoutY="358.0" />
-      <Label layoutX="100.0" layoutY="155.0" text="Movimiento:" />
-      <TextField fx:id="txtMovimiento" layoutX="217.0" layoutY="151.0" />
+      <Label layoutX="82.0" layoutY="82.0" text="Lugar de origen:" />
+      <TextField fx:id="txtPosicion" layoutX="217.0" layoutY="78.0" />
+      <Label layoutX="61.0" layoutY="167.0" text="Posicion de destino:" />
+      <TextField fx:id="txtDestino" layoutX="217.0" layoutY="163.0" />
+      <Label layoutX="120.0" layoutY="293.0" text="Estado:" />
+      <TextField fx:id="txtEstado" layoutX="213.0" layoutY="289.0" />
+      <Label layoutX="114.0" layoutY="345.0" text="Distancia:" />
+      <TextField fx:id="txtDistancia" layoutX="213.0" layoutY="341.0" />
+      <Label layoutX="118.0" layoutY="399.0" text="Tiempo:" />
+      <TextField fx:id="txtTiempo" layoutX="213.0" layoutY="395.0" />
+      <Label layoutX="100.0" layoutY="122.0" text="Movimiento:" />
+      <TextField fx:id="txtMovimiento" layoutX="217.0" layoutY="118.0" />
+      <Label layoutX="79.0" layoutY="208.0" text="Direccion cliente:" />
+      <Label layoutX="71.0" layoutY="246.0" text="Direccion negocio:" />
+      <TextField fx:id="txtDireccionCliente" layoutX="217.0" layoutY="204.0" prefHeight="25.0" prefWidth="255.0" />
+      <TextField fx:id="txtDireccionNegocio" layoutX="217.0" layoutY="242.0" prefHeight="25.0" prefWidth="255.0" />
    </children>
 </Pane>

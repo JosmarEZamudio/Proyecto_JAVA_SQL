@@ -2,14 +2,16 @@ package com.example.controladorSesion;
 
 public class datosSesionRestaurante {
 //Variables estaticas para todas nuestras clases
-    private static int idRestaurante;
+    private static Integer idRestaurante = null;
     private static int idProductoRegistroActual;
     private static String nombreRestaurante; 
-//Variables para guardar la ubicacion
-    private static int coordenadaX;
-    private static int coordenadaY;
+//Variables para guardar la ubicacion y nombre
+    private static String direccion = null;
+    private static Double coordenadaX = null;
+    private static Double coordenadaY = null;
+    private static Integer idUbicacion = null;
 //Funcion donde se le da un valor a un atributo
-    public static void iniciar(int id, String nombre){
+    public static void iniciar(Integer id, String nombre){
         idRestaurante = id;
         nombreRestaurante = nombre;
     }
@@ -18,13 +20,18 @@ public class datosSesionRestaurante {
         idProductoRegistroActual = id;
     }
 
-    public static void guardarUbicacion(int x, int y){
+    public static void guardarUbicacion(Double x, Double y, String nombre){
+        direccion = nombre;
         coordenadaX = x;
         coordenadaY = y;
     }
+
+    public static void idUbicacion(Integer id){
+        idUbicacion = id;
+    }
     
 //Funcion que mantiene el id de restaurante en todo el tiempo que dura la sesion
-    public static int getIdRestaurante(){
+    public static Integer getIdRestaurante(){
         return idRestaurante;
     }
 //Funcion que regresa el id de un producto recientemente registrado (el ultimo)
@@ -36,11 +43,19 @@ public class datosSesionRestaurante {
         return nombreRestaurante;
     }
 
-    public static int getCoordenadaX(){
+    public static String getDireccion(){
+        return direccion;
+    }
+
+    public static Double getCoordenadaX(){
         return coordenadaX;
     }
 
-    public static int getCoordenadaY(){
+    public static Double getCoordenadaY(){
         return coordenadaY;
+    }
+
+    public static Integer getIdUbicacion(){
+        return idUbicacion;
     }
 }
