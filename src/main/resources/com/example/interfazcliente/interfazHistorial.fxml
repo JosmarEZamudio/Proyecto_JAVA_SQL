@@ -27,11 +27,11 @@
             <TableView fx:id="tbvDetalle" prefHeight="158.0" prefWidth="467.0">
               <columns>
                 <TableColumn fx:id="tbcProducto" prefWidth="75.0" text="Producto" />
-                <TableColumn fx:id="tbcLugar" prefWidth="75.0" text="Lugar" />
-                  <TableColumn fx:id="tbcCantidad" prefWidth="75.0" text="Cantidad" />
-                  <TableColumn fx:id="tbcSubtotal" prefWidth="75.0" text="Subtotal" />
-                  <TableColumn fx:id="tbcPrecio" prefWidth="75.0" text="Precio C/U" />
-                  <TableColumn fx:id="tbcDetallePedido" prefWidth="86.4000244140625" text="Id detalle" />
+                <TableColumn fx:id="tbcLugar" prefWidth="92.79999542236328" text="Lugar" />
+                  <TableColumn fx:id="tbcCantidad" prefWidth="72.0" text="Cantidad" />
+                  <TableColumn fx:id="tbcSubtotal" prefWidth="60.80000305175781" text="Subtotal" />
+                  <TableColumn fx:id="tbcPrecio" prefWidth="97.60003662109375" text="Precio C/U" />
+                  <TableColumn fx:id="tbcDetallePedido" prefWidth="64.79998779296875" text="Id detalle" />
               </columns>
             </TableView>
          </content>

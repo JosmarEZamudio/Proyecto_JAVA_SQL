@@ -16,7 +16,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 //Librerias adicionales
-import com.example.controladorConector;
+import com.example.controladorConectorPool;
 import com.example.controladorPrincipal;
 import com.example.dialogosMensajes;
 import com.example.controladorSesion.datosSesionRestaurante;
@@ -214,7 +214,7 @@ public class ControladorMenuRestaurante { //Inicio de la clase
             System.out.println(id);
         String sql = "SELECT COUNT(*) AS cantidad FROM producto WHERE id_restaurante = ?";
         int valor=0; //inicializar variable para poder utilizar despues
-        try(Connection conexion = controladorConector.conectar();
+        try(Connection conexion = controladorConectorPool.conectar();
             PreparedStatement consultar = conexion.prepareStatement(sql);
         ){ //TWR para cerrar conexion y Prepared
                 consultar.setInt(1,id);
@@ -233,13 +233,14 @@ public class ControladorMenuRestaurante { //Inicio de la clase
         Integer id = datosSesionRestaurante.getIdRestaurante();
         Integer valor = null;
     //Setencia sql     
-        String sql = "SELECT COUNT(detallePedido.id_pedido) AS cantidad FROM detallePedido JOIN producto "
-        +"ON detallePedido.id_producto = producto.id_producto "
+        String sql = "SELECT COUNT(detallepedido.id_pedido) AS cantidad " 
+        +"FROM detallepedido JOIN producto "
+        +"ON detallepedido.id_producto = producto.id_producto "
         +"JOIN restaurante "
         +"ON producto.id_restaurante = restaurante.id_restaurante "
         +"WHERE restaurante.id_restaurante = ?";
     //Primer try Connection y Prepared
-        try(Connection conexion = controladorConector.conectar();
+        try(Connection conexion = controladorConectorPool.conectar();
             PreparedStatement consultar = conexion.prepareStatement(sql);){
                 consultar.setInt(1, id);
                 try(ResultSet resultado = consultar.executeQuery();){
@@ -258,16 +259,17 @@ public class ControladorMenuRestaurante { //Inicio de la clase
         String direccion = null;
         Double longitud = null;
         Double latitud = null;
+        Integer idUbicacion = null;
     //Obtener datos para realizar consultas
         Integer idRestaurante = datosSesionRestaurante.getIdRestaurante();
     //Segunda setencia sql
         String sqlUbicacion = """
-            SELECT direccion,coordenada_y,coordenada_x
+            SELECT direccion,coordenada_y,coordenada_x,id_ubicacion
             FROM ubicacion
             WHERE id_restaurante = ? AND activo = ?
             """;
         //Segunda consulta
-        try(Connection conexion = controladorConector.conectar();
+        try(Connection conexion = controladorConectorPool.conectar();
             PreparedStatement consultarUbicacion = conexion.prepareStatement(sqlUbicacion)){
            
             consultarUbicacion.setInt(1, idRestaurante);
@@ -277,6 +279,7 @@ public class ControladorMenuRestaurante { //Inicio de la clase
                     direccion = resultado.getString(1);
                     longitud = resultado.getDouble(2);
                     latitud = resultado.getDouble(3);
+                    idUbicacion = resultado.getInt(4);
                 }
             }//Cierra try Prepared
         }//Cierra try Result
@@ -284,6 +287,7 @@ public class ControladorMenuRestaurante { //Inicio de la clase
     //Validar si las variables obtuvieron un valor
         if(direccion!=null && latitud != null && longitud != null){
             datosSesionRestaurante.guardarUbicacion(latitud, longitud, direccion);
+            datosSesionRestaurante.idUbicacion(idUbicacion);
             lblUbicacion.setText(direccion);
         }
     }
@@ -310,6 +314,7 @@ public class ControladorMenuRestaurante { //Inicio de la clase
             }catch(SQLException e){
                 dialogosMensajes.mensajeError("Mensaje error", 
                 "No se pudo realizar la consulta.");
+                e.printStackTrace();
                 return;
             }
     }

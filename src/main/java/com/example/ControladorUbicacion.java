@@ -36,8 +36,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 
-
-
 public class ControladorUbicacion {
 //Botones fxml
     @FXML 
@@ -263,7 +261,7 @@ public class ControladorUbicacion {
             AND (id_cliente = ? OR id_restaurante = ?)
         """;
     //Abrir try Connection y prepared
-        try(Connection conexion = controladorConector.conectar();
+        try(Connection conexion = controladorConectorPool.conectar();
             PreparedStatement consultar = conexion.prepareStatement(sqlUbicacion);){
                 consultar.setString(1, direccion);
             //Si existe el id del cliente
@@ -355,7 +353,7 @@ public class ControladorUbicacion {
             VALUES (?,?,?,?,?,?)
         """;
     //Abre try Connection y Prepared
-        try(Connection conexion = controladorConector.conectar();
+        try(Connection conexion = controladorConectorPool.conectar();
             PreparedStatement insertar = conexion.prepareStatement(sql);){
                 insertar.setString(1, nombre);
                 insertar.setDouble(2, x);
@@ -388,7 +386,7 @@ public class ControladorUbicacion {
             WHERE id_restaurante = ?
         """;
         //Abre try Connection y Prepared
-        try(Connection conexion = controladorConector.conectar();
+        try(Connection conexion = controladorConectorPool.conectar();
             PreparedStatement insertar = conexion.prepareStatement(sql);){
                 insertar.setInt(1, activo);
                 insertar.setInt(2, datosSesionRestaurante.getIdRestaurante());
@@ -405,7 +403,7 @@ public class ControladorUbicacion {
             WHERE id_ubicacion = ?
         """;
         //Abre try Connection y Prepared
-        try(Connection conexion = controladorConector.conectar();
+        try(Connection conexion = controladorConectorPool.conectar();
             PreparedStatement insertar = conexion.prepareStatement(sql);){
                 insertar.setInt(1, activo);
                 insertar.setInt(2, datosSesionRestaurante.getIdUbicacion());
@@ -448,7 +446,7 @@ public class ControladorUbicacion {
             WHERE id_cliente = ? OR id_restaurante = ?
         """;
 
-        try(Connection conexion = controladorConector.conectar();
+        try(Connection conexion = controladorConectorPool.conectar();
             PreparedStatement consultar = conexion.prepareStatement(sql);){
             //Validar si idCliente contiene un valor
                 if(idCliente != null){

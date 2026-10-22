@@ -16,7 +16,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 //Librerias, clases, objetos adicionales
-import com.example.controladorConector;
+import com.example.controladorConectorPool;
 import com.example.dialogosMensajes;
 import com.example.controladorSesion.datosSesionRestaurante;
 import java.io.IOException;
@@ -52,7 +52,7 @@ public class ControladorDesplegarProducto {
     //Sentencia aqñ
         String sql = "SELECT id_producto,nombre,precio,disponibilidad FROM producto WHERE id_restaurante = ?";
     //Inicia try Connection y Prepared
-        try(Connection conexion = controladorConector.conectar();
+        try(Connection conexion = controladorConectorPool.conectar();
             PreparedStatement consultar = conexion.prepareStatement(sql)){
                 consultar.setInt(1, id);
                 try(ResultSet resultado =  consultar.executeQuery();){
@@ -83,7 +83,7 @@ public class ControladorDesplegarProducto {
         //Sentencia sql
         String sql = "UPDATE producto SET disponibilidad = 0 WHERE id_restaurante = ? AND id_producto = ?";
         //Incia try Connection y prepared
-        try(Connection conexion = controladorConector.conectar();
+        try(Connection conexion = controladorConectorPool.conectar();
             PreparedStatement editar = conexion.prepareStatement(sql);){
                 editar.setInt(1, id);
                 editar.setInt(2, id_producto);
@@ -99,7 +99,7 @@ public class ControladorDesplegarProducto {
     //Sentencia sql
         String sql = "UPDATE producto SET disponibilidad = 1 WHERE id_restaurante = ? AND id_producto=?";
     //Incia try Connection y Preprared
-        try(Connection conexion = controladorConector.conectar();
+        try(Connection conexion = controladorConectorPool.conectar();
             PreparedStatement editar = conexion.prepareStatement(sql)){
                 editar.setInt(1, id);
                 editar.setInt(2, id_producto);
@@ -181,7 +181,7 @@ public class ControladorDesplegarProducto {
     //Sentencia sql
         String sql = "SELECT COUNT(*) AS resultado FROM producto WHERE id_restaurante = ?";
     //Connection y Prepared
-        try(Connection conexion = controladorConector.conectar();
+        try(Connection conexion = controladorConectorPool.conectar();
             PreparedStatement consultar = conexion.prepareStatement(sql)){
                 consultar.setInt(1, id);
                 try(ResultSet resultado = consultar.executeQuery();){
@@ -201,7 +201,7 @@ public class ControladorDesplegarProducto {
     //Sentencia sql
         String sql = "SELECT COUNT(id_producto) AS cantidad FROM producto WHERE id_restaurante = ? AND disponibilidad = ?";
     //Inicia try Connection y Prepared
-        try(Connection conexion = controladorConector.conectar();
+        try(Connection conexion = controladorConectorPool.conectar();
             PreparedStatement consultar = conexion.prepareStatement(sql);){
                 consultar.setInt(1, id);
                 consultar.setInt(2, 1);
@@ -223,7 +223,7 @@ public class ControladorDesplegarProducto {
     //Sentencia sql
         String sql = "SELECT COUNT(id_producto) AS cantidad FROM producto WHERE id_restaurante= ? AND disponibilidad = ?";
         //Iniciar try Connection y Prepared
-        try(Connection conexion = controladorConector.conectar();
+        try(Connection conexion = controladorConectorPool.conectar();
             PreparedStatement consultar = conexion.prepareStatement(sql);){
                 consultar.setInt(1, id);
                 consultar.setInt(2, 0);

@@ -14,13 +14,16 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 import com.example.controladorSesion.ControladorInicioSesion;
+import com.example.controladorSesion.datosSesionCliente;
+import com.example.controladorSesion.datosSesionRestaurante;
+import com.example.controladoresRestaurante.ControladorMenuRestaurante;
 import com.example.controladoresSimulacion.ControladorSeguimiento;
 import com.example.controladoresSimulacion.ControladorSimulacion;
 
 public class controladorPrincipal {
 //Objeto dialogos
     dialogosMensajes dialogos = new dialogosMensajes();
-//Instancia de simulacion 
+//Objetos de clase
     private final ControladorSimulacion simulacion = new ControladorSimulacion();
     private ControladorSeguimiento seguimientoActual;
     private controladorPrincipal principal;
@@ -96,6 +99,9 @@ public class controladorPrincipal {
         );
     //Obtener raiz pane
         Pane menu = loaderRestaurante.load();
+    //Pasar controlador 
+        ControladorMenuRestaurante menuRestaurante = loaderRestaurante.getController();
+        menuRestaurante.setControladorPrincipal(this);
     //Setear contenedor
         contenedorPrincipal.setContent(menu);
     }
@@ -191,13 +197,20 @@ public class controladorPrincipal {
     @FXML 
     private void saludoInicial() throws Exception{
     //Cargar archivo fxml
-        FXMLLoader loaderSaludo = new FXMLLoader(
-            getClass().getResource("saludoInicial.fxml")
-        );
+        try{
+            FXMLLoader loaderSaludo = new FXMLLoader(
+                getClass().getResource("saludoInicial.fxml")
+            );
     //Cargar raiz pane
-        Pane saludo = loaderSaludo.load();
+            Pane saludo = loaderSaludo.load();
     //Setear contenedor
-        contenedorPrincipal.setContent(saludo);
+            contenedorPrincipal.setContent(saludo);
+        }
+        catch(IOException e){
+            dialogosMensajes.mensajeError("Mensaje error", 
+            "No se pudo cargar la interfaz, intente de nuevo.");
+            return;
+        }
     }
 
 //Metodo para acceder a la simulacion 
@@ -210,20 +223,44 @@ public class controladorPrincipal {
             "No se pudo cambiar de estado.");
         }
     }
+
 //Metodo para asginar controlador 
     public void setControladorPrincipal(controladorPrincipal principal) {
          System.out.println("Setter del menú recibió: " + principal);
         this.principal = principal;
     }
 
+//Metodos de validacion para no acceder a opciones no permitidas para cliente
+    @FXML 
+    public void mostrarOpcionesCliente(){
+    //Si el cliente esta logeado
+        if(datosSesionCliente.getIdCliente()!=null){
+            btnCliente.setDisable(false);
+            btnRegistroCliente.setDisable(true);
+            btnRegistroNegocio.setDisable(true);
+            btnSesion.setDisable(true);
+        }
+    }
+
+//Metodo de validacion para no acceder a opciones no permitidas para negocio
+    @FXML 
+    public void mostrarOpcionesRestaurante(){
+        if(datosSesionRestaurante.getIdRestaurante()!=null){
+            btnRestaurante.setDisable(false);
+            btnRegistroCliente.setDisable(true);
+            btnRegistroNegocio.setDisable(true);
+            btnSesion.setDisable(true);
+        }
+    }
+
 //Metodo de inicializacion
     @FXML 
     public void initialize() throws Exception{ 
         saludoInicial();
-        btnCliente.setDisable(false);
-        btnRestaurante.setDisable(false);
-        btnRepartidor.setDisable(false);
-        btnSimulacion.setDisable(false);        
+        btnCliente.setDisable(true);
+        btnRestaurante.setDisable(true);
+        btnRepartidor.setDisable(true);
+        btnSimulacion.setDisable(true);        
     }
     
 }

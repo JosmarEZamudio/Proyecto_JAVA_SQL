@@ -17,7 +17,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 //Librerias para conector y datos flotantes
-import com.example.controladorConector;
+import com.example.controladorConectorPool;
 import com.example.dialogosMensajes;
 import com.example.controladorSesion.datosSesionCliente;
 //Librerias adicionales
@@ -70,7 +70,7 @@ public class ControladorHistorialCliente {
     //Sentencia sql
         String sql = "SELECT id_pedido,fecha,estado FROM pedido WHERE id_cliente = ?";
     //Abre try Connection y Prepared
-        try(Connection conexion = controladorConector.conectar();
+        try(Connection conexion = controladorConectorPool.conectar();
             PreparedStatement consultar = conexion.prepareStatement(sql);){
                 consultar.setInt(1, id);
                 try(ResultSet resultado = consultar.executeQuery();){
@@ -91,19 +91,19 @@ public class ControladorHistorialCliente {
     private void detallePedido(int id) throws SQLException{   
     //Sentencia sql
         String sql = """
-            SELECT detallepedido.id_detallePedido, producto.nombre, restaurante.nombre,
+            SELECT detallepedido.id_detallepedido, producto.nombre, restaurante.nombre,
             detallepedido.cantidad, detallepedido.precio_unitario,
             detallepedido.cantidad*detallepedido.precio_unitario AS subtotal
             FROM pedido JOIN detallepedido
             ON pedido.id_pedido = detallepedido.id_pedido
             JOIN producto 
-            ON detallePedido.id_producto = producto.id_producto
+            ON detallepedido.id_producto = producto.id_producto
             JOIN restaurante 
             ON producto.id_restaurante = restaurante.id_restaurante
             WHERE pedido.id_pedido = ?
         """;
     //Inicia try Connection y Prepared
-        try(Connection conexion = controladorConector.conectar();
+        try(Connection conexion = controladorConectorPool.conectar();
             PreparedStatement consultar = conexion.prepareStatement(sql);){
                 consultar.setInt(1, id);
             //Inicia try ResultSet

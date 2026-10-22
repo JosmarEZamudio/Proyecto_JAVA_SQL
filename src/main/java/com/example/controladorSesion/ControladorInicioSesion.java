@@ -16,7 +16,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 //Funciones adicionales
-import com.example.controladorConector;
+import com.example.controladorConectorPool;
 import com.example.controladorPrincipal;
 import com.example.dialogosMensajes;
 import com.example.controladoresRestaurante.ControladorMenuRestaurante;
@@ -55,7 +55,7 @@ public class ControladorInicioSesion {
     //Setencia sql
         String sql = "SELECT id_cliente,nombre FROM cliente WHERE correo = ? AND contrasena = ?";
     //Empieza try Connection y Prepared
-        try(Connection conexion = controladorConector.conectar();
+        try(Connection conexion = controladorConectorPool.conectar();
             PreparedStatement consultar = conexion.prepareStatement(sql);){
                 consultar.setString(1, usuario);
                 consultar.setString(2, password);
@@ -63,9 +63,15 @@ public class ControladorInicioSesion {
                 if(resultado.next()){
                     int id = resultado.getInt("id_cliente");
                     String nombre = resultado.getString("nombre");
+                //Mantener a flote datos del cliente
                     datosSesionCliente.iniciar(id, nombre); //Pasar datos de sesion 
+                //Mostrar mensaje de bienvenida
+                    dialogosMensajes.mensajeInformacion("Informacion Sesion",
+                    "Usuario encontrado, bienvenido");
+                //Mostrar ventana y opciones del cliente
+                    principal.mostrarOpcionesCliente();
                     menuCliente(escenaActual);
-                    dialogosMensajes.mensajeInformacion("Informacion Sesion","Usuario encontrado, bienvenido");
+
                     return;
                 }else{
                     dialogosMensajes.mensajeError("Informacion Sesion",
@@ -76,6 +82,7 @@ public class ControladorInicioSesion {
         catch(SQLException e){
             dialogosMensajes.mensajeError("Informacion error", 
             "No se pudo conectar con la base, si persiste con el error contacte a soporte.");
+            e.printStackTrace();
             return;
         }
         catch(IOException e){
@@ -106,7 +113,7 @@ public class ControladorInicioSesion {
             WHERE correo = ? AND contrasena = ?
                 """;
     //Inicia conexion y consulta
-        try(Connection conexion = controladorConector.conectar();
+        try(Connection conexion = controladorConectorPool.conectar();
             PreparedStatement consultar = conexion.prepareStatement(sql);){
             consultar.setString(1, usuario);
             consultar.setString(2, password);
@@ -121,6 +128,7 @@ public class ControladorInicioSesion {
                         "Negocio encontrado, bienvenido."
                     );
                     menuRestaurante(escenaActual);
+                    principal.mostrarOpcionesRestaurante();
                     return;
                 }else{
                     dialogosMensajes.mensajeError("Informacion sesion", 

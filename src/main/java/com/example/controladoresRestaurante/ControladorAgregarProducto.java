@@ -13,7 +13,7 @@ import java.sql.Statement;
 //Importar librerias para ventanas
 import javafx.stage.FileChooser;
 //Importar clases
-import com.example.controladorConector;
+import com.example.controladorConectorPool;
 import com.example.dialogosMensajes;
 import com.example.controladorSesion.datosSesionRestaurante;
 //Import librerias para archivos
@@ -85,7 +85,7 @@ public class ControladorAgregarProducto {
                     +" VALUES(?,?,?,?)";
     //Realizar un TWR, en caso de falla
         try{
-            Connection conexion = controladorConector.conectar();
+            Connection conexion = controladorConectorPool.conectar();
                 conexion.setAutoCommit(false);
             PreparedStatement agregar = conexion.prepareStatement(sql,
                 Statement.RETURN_GENERATED_KEYS);

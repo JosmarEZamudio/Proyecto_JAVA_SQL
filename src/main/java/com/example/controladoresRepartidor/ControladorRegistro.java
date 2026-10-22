@@ -17,7 +17,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 //Librerias adicionales
 import java.io.IOException;
-import com.example.controladorConector;
+import com.example.controladorConectorPool;
 import com.example.dialogosMensajes;
 
 public class ControladorRegistro {
@@ -72,7 +72,7 @@ public class ControladorRegistro {
                     " VALUES(?,?,?,?,?,?) ";
         String setenciaSqlconsulta = "SELECT COUNT(*) AS resultado FROM repartidor WHERE correo = ?";
     //Inicia try Connection y Prepared
-        try(Connection conexion = controladorConector.conectar();
+        try(Connection conexion = controladorConectorPool.conectar();
             PreparedStatement agregar = conexion.prepareStatement(sentenciaSqlInsertar);
             PreparedStatement consultar = conexion.prepareStatement(setenciaSqlconsulta)){
 

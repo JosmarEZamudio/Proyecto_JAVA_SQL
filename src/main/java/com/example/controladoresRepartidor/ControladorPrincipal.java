@@ -19,7 +19,7 @@ import java.sql.SQLException;
 import java.util.concurrent.ThreadLocalRandom;
 //Librerias,clases adicionales
 import java.io.IOException;
-import com.example.controladorConector;
+import com.example.controladorConectorPool;
 import com.example.dialogosMensajes;
 import com.example.controladorSesion.datosSesionRepartidor;
 
@@ -169,7 +169,7 @@ public class ControladorPrincipal {
             WHERE id_repartidor = ?
         """;
     //Inicia try
-        try(Connection conexion = controladorConector.conectar();
+        try(Connection conexion = controladorConectorPool.conectar();
             PreparedStatement actualizar = conexion.prepareStatement(sql);){
                 actualizar.setDouble(1, ubicacion[0]);
                 actualizar.setDouble(2, ubicacion[1]);
@@ -201,7 +201,7 @@ public class ControladorPrincipal {
     //Inicia try 
         Connection conexion = null;
         try{
-            conexion = controladorConector.conectar();
+            conexion = controladorConectorPool.conectar();
             conexion.setAutoCommit(false);
             try(PreparedStatement editar = conexion.prepareStatement(sql);){
                 editar.setInt(1, 0);

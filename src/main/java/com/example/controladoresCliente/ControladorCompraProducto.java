@@ -25,7 +25,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 //Librerias adicionales, clases, etcerta
-import com.example.controladorConector;
+import com.example.controladorConectorPool;
 import com.example.dialogosMensajes;
 import com.example.controladorSesion.datosSesionCliente;
 import com.example.controladoresSimulacion.ControladorUbicaciones;
@@ -72,7 +72,7 @@ public class ControladorCompraProducto {
     //Sentencia sql
         String sql = "SELECT id_producto,nombre,precio FROM producto WHERE id_restaurante = ? AND disponibilidad = ?";
     //Abre primer try Connection y Prepared  
-        try(Connection conexion = controladorConector.conectar();
+        try(Connection conexion = controladorConectorPool.conectar();
             PreparedStatement consultar = conexion.prepareStatement(sql);){
                 consultar.setInt(1, id);
                 consultar.setInt(2, disponibilidad);
@@ -233,7 +233,7 @@ public class ControladorCompraProducto {
         Connection conexion = null;
     //Abrir primer try Connection y Prepared
         try{
-            conexion = controladorConector.conectar();
+            conexion = controladorConectorPool.conectar();
             conexion.setAutoCommit(false);
             PreparedStatement agregar = conexion.prepareStatement(sql,
                 Statement.RETURN_GENERATED_KEYS);
@@ -284,7 +284,7 @@ public class ControladorCompraProducto {
         int idPedido = datosSesionCompra.getIdPedido();
     //Setencia sql
         String campos = "cantidad,precio_unitario,id_pedido,id_producto";
-        String sql= "INSERT INTO detallePedido("+campos+") VALUES (?,?,?,?)";
+        String sql= "INSERT INTO detallepedido("+campos+") VALUES (?,?,?,?)";
     //Inciar try Prepared
         try(PreparedStatement agregar = conexion.prepareStatement(sql);){
             for(Producto p : ControladorDetalle.listaProductos){

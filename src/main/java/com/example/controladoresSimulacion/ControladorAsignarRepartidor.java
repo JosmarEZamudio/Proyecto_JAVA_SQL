@@ -5,7 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 //Librerias, clases adicionales
-import com.example.controladorConector;
+import com.example.controladorConectorPool;
 import com.example.dialogosMensajes;
 import com.example.controladorSesion.datosSesionRestaurante;
 //Librerias adicionales
@@ -15,6 +15,7 @@ import java.util.List;
 public class ControladorAsignarRepartidor {
 
     private List<Repartidor> repartidores = new ArrayList<>(); 
+    public static Integer idRepartidor = null;
    
 //Metodo para encontrar las ubicacion de los repartidores
     private void consultarUbicacion() throws SQLException{
@@ -25,7 +26,7 @@ public class ControladorAsignarRepartidor {
             WHERE activo = ? AND disponibilidad = ?;
         """;
     //Inicia primer try Connection y Prepared
-        try(Connection conexion = controladorConector.conectar();
+        try(Connection conexion = controladorConectorPool.conectar();
             PreparedStatement consultar = conexion.prepareStatement(sql);){
                 consultar.setInt(1, 1);
                 consultar.setInt(2,1);
@@ -45,13 +46,13 @@ public class ControladorAsignarRepartidor {
     }
 
 //Metodo para asignar el repartidor cercano
-    public void repartidorCercano()  throws SQLException{
+    public Boolean repartidorCercano()  throws SQLException{
     //Llamar metodo que consulta ubicaciones de repartidores
     try{
         consultarUbicacion();
     }
     catch(SQLException e){
-        return;
+        return false;
     }
     //Inicializar variables utilizadas en la busqueda
         Repartidor repartidorCercano = null;
@@ -74,8 +75,8 @@ public class ControladorAsignarRepartidor {
                 repartidorCercano = r;
             }
         }//Termina for
-        int idRepartidor = 0;
-    //Asignar repartidor cercaco
+        
+    //Asignar repartidor cercano
         if(repartidorCercano!=null){           
             ControladorUbicaciones.setUbicacionRepartidor(
                 repartidorCercano.getCoordenadaX(),
@@ -83,11 +84,13 @@ public class ControladorAsignarRepartidor {
             );
             idRepartidor = repartidorCercano.getId();
             disponibilidad(idRepartidor);
+            registrarRepartidor(idRepartidor);
+            return true;
         }
         else{
             dialogosMensajes.mensajeInformacion("Mensaje informacion", 
             "No hay repartidores cercanos disponibles, continua la busqueda.");
-            return;
+            return false;
         }
     //Termina asignacion
     } 
@@ -120,6 +123,26 @@ public class ControladorAsignarRepartidor {
         return radioTierra * c;
     }
 
+//Metodo para guardar en la base el repartidor cercano
+    private void registrarRepartidor(int id) throws SQLException{
+
+    //Sentencia sql
+        String sql = """
+            UPDATE pedido
+            SET id_repartidor = ?
+            WHERE id_pedido = ?
+        """;
+    //Empieza try 
+        try(Connection conexion = controladorConectorPool.conectar();
+            PreparedStatement actualizar = conexion.prepareStatement(sql);){
+            //Asignar valores a las clausulas
+                actualizar.setInt(1, id);
+                actualizar.setInt(2, ControladorUbicaciones.getIdPedido());
+            //Ejectuar 
+                actualizar.executeUpdate();
+        }//Cierra try
+    }
+
 //Metodo para cambiar disponibilidad del repartidor 
     private void disponibilidad(int id) throws SQLException{
     //Sentencia sql
@@ -130,7 +153,7 @@ public class ControladorAsignarRepartidor {
         """;
     //Primer try connection y prepared
     Connection conexion = null;
-        try{conexion = controladorConector.conectar();
+        try{conexion = controladorConectorPool.conectar();
             conexion.setAutoCommit(false);
         //Segundo try 
             try(PreparedStatement consultar = conexion.prepareStatement(sql);){

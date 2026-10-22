@@ -6,7 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 //Librerias adicionales
-import com.example.controladorConector;
+import com.example.controladorConectorPool;
 import com.example.dialogosMensajes;
 //Componente de java fxml
 import javafx.fxml.FXML;
@@ -60,7 +60,7 @@ public class ControladorRegistroRestaurante {
         String sqlInsertar = "INSERT INTO restaurante("+campos+") VALUES(?,?,?,?)";
         String sqlConsultar = "SELECT COUNT(*) AS resultado FROM restaurante WHERE correo = ?";
     //Empieza try Connection
-        try(Connection conexion = controladorConector.conectar();){
+        try(Connection conexion = controladorConectorPool.conectar();){
             conexion.setAutoCommit(false);
         //***************** Empieza consulta
             try(PreparedStatement consultar = conexion.prepareStatement(sqlConsultar);){

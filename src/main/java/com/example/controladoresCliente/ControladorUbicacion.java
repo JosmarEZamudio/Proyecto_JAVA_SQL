@@ -7,8 +7,8 @@ import javafx.scene.control.Button;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-
-import com.example.controladorConector;
+//Librerias, clases adicionales
+import com.example.controladorConectorPool;
 import com.example.dialogosMensajes;
 import com.example.controladorSesion.datosSesionCliente;
 
@@ -44,7 +44,7 @@ public class ControladorUbicacion {
         Connection conexion = null;
     //Abre try
         try{
-            conexion = controladorConector.conectar();
+            conexion = controladorConectorPool.conectar();
             conexion.setAutoCommit(false);
             try(PreparedStatement actualizar = conexion.prepareStatement(sql);){
                 actualizar.setInt(1, coordenadaX);

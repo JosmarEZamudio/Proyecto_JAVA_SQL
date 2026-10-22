@@ -15,7 +15,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 //Librerias, clases, etc adicionales
-import com.example.controladorConector;
+import com.example.controladorConectorPool;
 import com.example.dialogosMensajes;
 import com.example.controladorPrincipal;
 import com.example.controladorSesion.datosSesionRestaurante;
@@ -74,17 +74,17 @@ public class ControladorPedidosPendientes {
         String sql = """
                 SELECT pedido.id_pedido, pedido.id_cliente,cliente.nombre, pedido.estado FROM cliente JOIN pedido
                 ON pedido.id_cliente = cliente.id_cliente
-                JOIN detallePedido 
-                ON pedido.id_pedido = detallePedido.id_pedido
+                JOIN detallepedido 
+                ON pedido.id_pedido = detallepedido.id_pedido
                 JOIN producto 
-                ON detallePedido.id_producto = producto.id_producto
+                ON detallepedido.id_producto = producto.id_producto
                 JOIN restaurante 
                 ON producto.id_restaurante = restaurante.id_restaurante
                 WHERE pedido.estado = ? AND restaurante.id_restaurante = ?
                 GROUP BY id_pedido
                 """;
     //Empieza try Connection y Prepared
-        try(Connection conexion = controladorConector.conectar();
+        try(Connection conexion = controladorConectorPool.conectar();
             PreparedStatement consultar = conexion.prepareStatement(sql);){
                 consultar.setInt(1, 0);
                 consultar.setInt(2, idRestaurante);
@@ -106,6 +106,7 @@ public class ControladorPedidosPendientes {
         catch(SQLException e){
             dialogosMensajes.mensajeError("Informacion error", 
             "No se pudo realizar la consulta, intente de nuevo.");
+            e.printStackTrace();
             return;
         }
     }
@@ -114,9 +115,20 @@ public class ControladorPedidosPendientes {
 //Metodo para ir poner pedido como listo 
     @FXML 
     private void pedidoListo() throws SQLException{
+    //Crear objeto de la clase asignar
+        ControladorAsignarRepartidor asignar = new ControladorAsignarRepartidor();
+    //Validar si se encontro un repartidor
+        if(asignar.repartidorCercano()==false){
+        /*  dialogosMensajes.mensajeInformacion("Mensaje informacion", 
+            "No se encontraron repartidores cercanos, seguimos buscando."); */
+            return;
+        } 
+    //Sentencia sql
         String sql = "UPDATE pedido SET estado = ? WHERE id_pedido = ?";
-
-        try(Connection conexion = controladorConector.conectar();
+    //Encuentra ubicacion del negocio
+        guardarUbicacionNegocio();
+    //Try connection y prepared
+        try(Connection conexion = controladorConectorPool.conectar();
             PreparedStatement editar = conexion.prepareStatement(sql);){
                 editar.setInt(1, 1);
                 editar.setInt(2, idPublica);
@@ -134,15 +146,13 @@ public class ControladorPedidosPendientes {
         catch(SQLException e){
             dialogosMensajes.mensajeError("Informacion error", 
             "No se pudo actualizar el estado, intente de nuevo");
+            return;
         }
     //Obtener ubicaciones del cliente y del negocio para enviarlos a la simulacion
         consultarUbicacionCliente();
         ControladorUbicaciones.setUbicacionNegocio(datosSesionRestaurante.getCoordenadaX(),
                 datosSesionRestaurante.getCoordenadaY(), datosSesionRestaurante.getDireccion());
-    //Empieza simulacion 
-        ControladorAsignarRepartidor asignar = new ControladorAsignarRepartidor();
-        asignar.repartidorCercano();
-    
+    //Iniciar simulacion
         principal.iniciarSimulacion();
        
     //Imprime coordenadas para validar
@@ -169,7 +179,7 @@ public class ControladorPedidosPendientes {
             WHERE pedido.estado = ? AND pedido.id_pedido = ? AND ubicacion.activo = ?
         """;
     //Incia try Connection y prepared
-        try(Connection conexion = controladorConector.conectar();
+        try(Connection conexion = controladorConectorPool.conectar();
             PreparedStatement consultar = conexion.prepareStatement(sql);){
                 consultar.setInt(1, 1);
                 consultar.setInt(2, idPublica);
@@ -227,6 +237,27 @@ public class ControladorPedidosPendientes {
         );//Ciera argumento de tbv
     }
 
+//Metodo para sar guardar el id de la ubicacion del restaurante cuando el pedido esta listo
+    @FXML 
+    private void guardarUbicacionNegocio() throws SQLException{
+    //Sentencia sql
+        String sql = """
+            UPDATE pedido
+            SET id_Ubicacionrestaurante = ?
+            WHERE id_pedido = ?
+        """;
+    //Incia try
+        try(Connection conexion = controladorConectorPool.conectar();
+            PreparedStatement actualizar = conexion.prepareStatement(sql);){
+                actualizar.setInt(1,datosSesionRestaurante.getIdUbicacion());
+                actualizar.setInt(2, idPublica);
+
+                actualizar.executeUpdate();
+        }
+
+
+    }
+
 //Metodo para consultar el detalle de pedidos pendientes mediante el boton buscar
     @FXML 
     private void detallePendienteBuscar() throws SQLException{
@@ -265,7 +296,7 @@ public class ControladorPedidosPendientes {
         String sql = """
                 SELECT p.id_pedido, c.nombre, d.cantidad,pr.nombre AS producto FROM cliente AS c JOIN pedido AS p
                 ON p.id_cliente = c.id_cliente
-                JOIN detallePedido AS d
+                JOIN detallepedido AS d
                 ON p.id_pedido = d.id_pedido
                 JOIN producto AS pr
                 ON pr.id_producto = d.id_producto
@@ -273,7 +304,7 @@ public class ControladorPedidosPendientes {
                 ORDER BY p.id_pedido ASC
                 """;
     //Primera try Connection y Prepared
-        try(Connection conexion = controladorConector.conectar();
+        try(Connection conexion = controladorConectorPool.conectar();
         PreparedStatement consultar = conexion.prepareStatement(sql);){
         //
             consultar.setInt(1, idPedido);

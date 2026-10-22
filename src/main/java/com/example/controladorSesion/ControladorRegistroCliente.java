@@ -17,7 +17,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 //Import conector y dialogos de mensajes
-import com.example.controladorConector;
+import com.example.controladorConectorPool;
 import com.example.dialogosMensajes;
 
 public class ControladorRegistroCliente {
@@ -67,7 +67,7 @@ public class ControladorRegistroCliente {
         """;
         String sqlConsultar = "SELECT COUNT(*) AS resultado FROM cliente WHERE correo = ?";
 //***** Empieza conexion e insersion      
-        try(Connection conexion = controladorConector.conectar();){
+        try(Connection conexion = controladorConectorPool.conectar();){
             conexion.setAutoCommit(false);
         //**************************Inicia consulta
             try(PreparedStatement consultar = conexion.prepareStatement(sqlConsultar);){

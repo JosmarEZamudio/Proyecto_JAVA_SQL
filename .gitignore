@@ -1,5 +1,6 @@
 # Archivos generados por Maven
 target/
+base/
 
 # Configuración local de VS Code
 .vscode/

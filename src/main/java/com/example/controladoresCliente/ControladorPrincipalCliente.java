@@ -25,7 +25,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 //Librerias adicionales
 import java.io.IOException;
-import com.example.controladorConector;
+import com.example.controladorConectorPool;
 import com.example.dialogosMensajes;
 import com.example.controladorSesion.datosSesionCliente;
 
@@ -147,7 +147,7 @@ public class ControladorPrincipalCliente {
             ) <= 7000 AND activo = 1;
         """; 
     //Primer try Connection y Prepared
-        try(Connection conexion = controladorConector.conectar();
+        try(Connection conexion = controladorConectorPool.conectar();
             PreparedStatement consultar = conexion.prepareStatement(sql)){
             //Try resultSet
                 try(ResultSet resultado = consultar.executeQuery();){
@@ -224,7 +224,7 @@ public class ControladorPrincipalCliente {
     //Sentencia sql
         String sql = "SELECT COUNT(*) AS cantidad FROM pedido WHERE id_cliente = ?";
     //Abre primer try Connection y Prepared
-        try(Connection conexion = controladorConector.conectar();
+        try(Connection conexion = controladorConectorPool.conectar();
             PreparedStatement consultar = conexion.prepareStatement(sql);){
                 consultar.setInt(1, id);
                 try(ResultSet resultado = consultar.executeQuery();){

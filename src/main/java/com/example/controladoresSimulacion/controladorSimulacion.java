@@ -6,7 +6,7 @@ import javafx.animation.Timeline;
 import javafx.util.Duration;
 //Librerias, clases adicionales
 import java.util.Random;
-import com.example.controladorConector;
+import com.example.controladorConectorPool;
 import com.example.dialogosMensajes;
 
 //Librerias sql 
@@ -150,6 +150,7 @@ public class ControladorSimulacion {
             } else if (estado.equals("Entregando al cliente")) {
                 try{
                     cambiarEstado(5);
+                    cambiarDisponibilidad();
                 }
                 catch(SQLException e){
                     throw e;
@@ -219,7 +220,7 @@ public class ControladorSimulacion {
             WHERE id_pedido = ?
         """;
     //Try prepared y Connection
-        try(Connection conexion = controladorConector.conectar();
+        try(Connection conexion = controladorConectorPool.conectar();
             PreparedStatement actualizar = conexion.prepareStatement(sql);){
                 actualizar.setInt(1, i);
                 actualizar.setInt(2, ControladorUbicaciones.getIdPedido());
@@ -230,6 +231,22 @@ public class ControladorSimulacion {
             //dialogosMensajes.mensajeError("Mensaje error", 
             //"No se pudieron realizar los cambios de estado.");
             throw e;
+        }
+    }
+
+//Cambiar disponibilidad 
+    private void cambiarDisponibilidad() throws SQLException{
+        String sql= """
+            UPDATE repartidor 
+            SET disponibilidad = ?
+            WHERE id_repartidor = ?
+        """;
+        try(Connection conexion = controladorConectorPool.conectar();
+            PreparedStatement actualizar = conexion.prepareStatement(sql);){
+                actualizar.setInt(1, 1);
+                actualizar.setInt(2, ControladorAsignarRepartidor.idRepartidor);
+
+                actualizar.executeUpdate();
         }
     }
 

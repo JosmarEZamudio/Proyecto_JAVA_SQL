@@ -175,7 +175,11 @@ public class ControladorConsultarProducto {
     //Limpiar texts y refrescar tableview
         txtEditarNombre.clear();
         txtEditarPrecio.clear();
+        txtEditarNombre.setDisable(true);
+        txtEditarPrecio.setDisable(true);
         tbvProductos.setDisable(false);
+        btnGuardar.setDisable(true);
+        btnEditar.setDisable(false);
         consultarProductos();
     }
 

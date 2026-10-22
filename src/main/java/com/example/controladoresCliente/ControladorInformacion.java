@@ -14,7 +14,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 //Librerias adicionales
-import com.example.controladorConector;
+import com.example.controladorConectorPool;
 import com.example.dialogosMensajes;
 import com.example.controladorSesion.datosSesionCliente;
 import java.io.IOException;
@@ -45,7 +45,7 @@ public class ControladorInformacion {
         String campos = "nombre,apellido_paterno,telefono,correo";
         String sql = "SELECT "+campos+" FROM cliente WHERE id_cliente = ?";
     //Abre primer try Connection y Prepared
-        try(Connection conexion = controladorConector.conectar();
+        try(Connection conexion = controladorConectorPool.conectar();
             PreparedStatement consultar = conexion.prepareStatement(sql)){
                 consultar.setInt(1, idCliente);
                 try(ResultSet resultado = consultar.executeQuery();){
@@ -66,7 +66,7 @@ public class ControladorInformacion {
     //Setencia de sql 
         String sql = "UPDATE cliente SET nombre = ?, apellido_paterno = ?,telefono = ?, correo = ? WHERE id_cliente = ?";
     //Abre try Connection y PreparedStatment
-        try(Connection conexion = controladorConector.conectar();
+        try(Connection conexion = controladorConectorPool.conectar();
             PreparedStatement actualizar = conexion.prepareStatement(sql)){
                 actualizar.setString(1, txtNombre.getText());
                 actualizar.setString(2, txtApellido.getText());

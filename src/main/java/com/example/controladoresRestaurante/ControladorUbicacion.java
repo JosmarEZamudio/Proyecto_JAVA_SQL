@@ -9,8 +9,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 //Librerias, clases adicionales
-
-import com.example.controladorConector;
+import com.example.controladorConectorPool;
 import com.example.dialogosMensajes;
 import com.example.controladorSesion.datosSesionRestaurante;
 
@@ -48,7 +47,7 @@ public class ControladorUbicacion {
         Connection conexion = null;
     //Iniciar try
         try{
-            conexion = controladorConector.conectar();
+            conexion = controladorConectorPool.conectar();
             conexion.setAutoCommit(false);
             //TWR Prepared
             try(PreparedStatement guardar = conexion.prepareStatement(sql);){
@@ -98,7 +97,7 @@ public class ControladorUbicacion {
     //Setencia sql
         String sql = "SELECT coordenada_x,coordenada_y FROM restaurante WHERE id_restaurante = ?";
     //Empieza primer try Connection y Prepared
-        try(Connection conexion = controladorConector.conectar();
+        try(Connection conexion = controladorConectorPool.conectar();
             PreparedStatement consultar  = conexion.prepareStatement(sql);){
                 consultar.setInt(1, id);
                 try(ResultSet resultado = consultar.executeQuery();){

@@ -15,7 +15,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 //Librerias adicionales
 import java.io.IOException;
-import com.example.controladorConector;
+import com.example.controladorConectorPool;
 import com.example.dialogosMensajes;
 import com.example.controladorSesion.datosSesionRepartidor;
 
@@ -45,7 +45,7 @@ public class ControladorInformacion {
     //Sentencia sql
         String sql = "SELECT nombre,apellido_paterno,apellido_materno FROM repartidor WHERE id_repartidor = ?";
     //Abre primer try Connection y Prepared
-        try(Connection conexion = controladorConector.conectar();
+        try(Connection conexion = controladorConectorPool.conectar();
         PreparedStatement consultar = conexion.prepareStatement(sql);){
             consultar.setInt(1, id);
         //Abre segundo try ResultSet
@@ -86,7 +86,7 @@ public class ControladorInformacion {
                 """;
         Connection conexion = null;
         try{
-            conexion = controladorConector.conectar();
+            conexion = controladorConectorPool.conectar();
             conexion.setAutoCommit(false);
            try(PreparedStatement actualizar = conexion.prepareStatement(sql);){
                 actualizar.setString(1, nombre);
