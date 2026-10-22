@@ -5,9 +5,9 @@ import java.time.LocalDate;
 public class Historial {
     private int id_pedido;
     private LocalDate fecha;
-    private int estado;
+    private String estado;
 
-    public Historial(int idP, LocalDate fecha, int estado){
+    public Historial(int idP, LocalDate fecha, String estado){
         this.id_pedido = idP;
         this.fecha = fecha;
         this.estado = estado;
@@ -21,7 +21,7 @@ public class Historial {
         return fecha;
     }
 
-    public int getEstado(){
+    public String getEstado(){
         return estado;
     }
     

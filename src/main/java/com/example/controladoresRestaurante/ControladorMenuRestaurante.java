@@ -151,6 +151,7 @@ public class ControladorMenuRestaurante { //Inicio de la clase
         catch(IOException e){
             dialogosMensajes.mensajeError("Informacion error", 
             "No se puede cargar la interfaz, si el error persiste contactar a soporte.");
+            e.printStackTrace();
             return;
         }   
     }
@@ -168,9 +169,10 @@ public class ControladorMenuRestaurante { //Inicio de la clase
     //Obtener Scroll pane actual y psasarle el pane
         ScrollPane contenedor = (ScrollPane) escenaActual.lookup("#contenedorprincipal");
         contenedor.setContent(cerrar);
-
     //Si se inicio sesion con restaurante inicializar valores en nulo
         if(datosSesionRestaurante.getIdRestaurante()!=null){
+        //Habilitar y desahabilitar opciones
+            principal.ocultarOpciones();
         //Id y nombre restaurante
             datosSesionRestaurante.iniciar(null, null);
         //Coordenadas y direccion
@@ -183,13 +185,14 @@ public class ControladorMenuRestaurante { //Inicio de la clase
 //Metodo para ir a la interfaz de ubicacion
     @FXML
     private void ubicacion() throws IOException{
+    //Cargar archivo fxml loader
         FXMLLoader loaderUbicacion = new FXMLLoader(
             getClass().getResource("/com/example/pruebaUbicacion.fxml")
         );
-
+    //Escena y ventana nueva
         Scene ubicacion = new Scene(loaderUbicacion.load());
         Stage ventanaNueva = new Stage();
-
+    //Definir propiedades de la ventana nueva
         ventanaNueva.setTitle("Guardar ubicacion");
         ventanaNueva.initModality(Modality.APPLICATION_MODAL);
         ventanaNueva.setScene(ubicacion);
@@ -203,8 +206,8 @@ public class ControladorMenuRestaurante { //Inicio de la clase
                 }
             }
         );
+    //Mostrar ventana
         ventanaNueva.showAndWait();
-
     }
 
 //Metodo para hacer una consulta sobre si hay productos existente
@@ -284,7 +287,8 @@ public class ControladorMenuRestaurante { //Inicio de la clase
             }//Cierra try Prepared
         }//Cierra try Result
         //Termina segunda consulta
-    //Validar si las variables obtuvieron un valor
+
+//Validar si las variables obtuvieron un valor
         if(direccion!=null && latitud != null && longitud != null){
             datosSesionRestaurante.guardarUbicacion(latitud, longitud, direccion);
             datosSesionRestaurante.idUbicacion(idUbicacion);

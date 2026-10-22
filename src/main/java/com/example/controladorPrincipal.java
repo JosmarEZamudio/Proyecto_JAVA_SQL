@@ -26,7 +26,7 @@ public class controladorPrincipal {
 //Objetos de clase
     private final ControladorSimulacion simulacion = new ControladorSimulacion();
     private ControladorSeguimiento seguimientoActual;
-    private controladorPrincipal principal;
+    private controladorPrincipal principal = this;
 //Botones
     @FXML 
     private Button btnSesion;
@@ -54,56 +54,86 @@ public class controladorPrincipal {
     @FXML
     private void registroUsuario() throws Exception{
     //Cargar archivo fxml
-        FXMLLoader loaderRegistroCliente = new FXMLLoader(
-            getClass().getResource("/com/example/interfazsesion/interfazRegistroCliente.fxml")
-        );
-    //Cargar raiz pane 
-        Pane registro = loaderRegistroCliente.load(); 
-    //Setear contenedor
-        contenedorPrincipal.setContent(registro); 
+        try{
+            FXMLLoader loaderRegistroCliente = new FXMLLoader(
+                getClass().getResource("/com/example/interfazsesion/interfazRegistroCliente.fxml")
+            );
+        //Cargar raiz pane 
+            Pane registro = loaderRegistroCliente.load(); 
+        //Setear contenedor
+            contenedorPrincipal.setContent(registro); 
+        }
+        catch(IOException e){
+            dialogosMensajes.mensajeError("Informacion error", 
+            "No se pudo cargar la interfaz, intente de nuevo.");
+            return;
+        }
     }
+
 //Metodo para mostrar interfaz registro negocio  
     @FXML
     private void registroNegocio() throws Exception{
     //Cagar archivo fxml
-        FXMLLoader loaderRegistroNegocio = new FXMLLoader(
-            getClass().getResource("/com/example/interfazsesion/interfazRegistroRestaurante.fxml")
-        );
-    //Obtener raiz pane
-        Pane registro = loaderRegistroNegocio.load();
-    //Setear contenedor
-        contenedorPrincipal.setContent(registro);
+        try{
+            FXMLLoader loaderRegistroNegocio = new FXMLLoader(
+                getClass().getResource("/com/example/interfazsesion/interfazRegistroRestaurante.fxml")
+            );
+        //Obtener raiz pane
+            Pane registro = loaderRegistroNegocio.load();
+        //Setear contenedor
+            contenedorPrincipal.setContent(registro);
+        }
+        catch(IOException e){
+            dialogosMensajes.mensajeError("Informacion error",
+            "No se pudo cargar la interfaz, intente de nuevo.");
+            return;
+        }
     }
+
 //Metodo para mostrar interfaz de inicio sesion
     @FXML 
     private void iniciarSesion() throws Exception{
     //Cargar archivo fxml
-        FXMLLoader loaderSesion = new FXMLLoader(
-            getClass().getResource("/com/example/interfazsesion/iniciarSesion.fxml")
-        );
-    //Cargar raiz pane
-        Pane sesion = loaderSesion.load();
-    //Obtener controlador del fxml
-        ControladorInicioSesion controlador = loaderSesion.getController();
-        controlador.setControladorPrincipal(this);
-    //Setear contenedor
-        contenedorPrincipal.setContent(sesion); 
+        try{
+            FXMLLoader loaderSesion = new FXMLLoader(
+                getClass().getResource("/com/example/interfazsesion/iniciarSesion.fxml")
+            );
+        //Cargar raiz pane
+            Pane sesion = loaderSesion.load();
+        //Obtener controlador del fxml
+            ControladorInicioSesion controlador = loaderSesion.getController();
+            controlador.setControladorPrincipal(principal);
+        //Setear contenedor
+            contenedorPrincipal.setContent(sesion); 
+        }
+        catch(IOException e){
+            dialogosMensajes.mensajeError("Informacion error",
+            "No se pudo cargar la interfaz, intente de nuevo.");
+            return;
+        }
     }
 
 //Metodo para mostrar interfaz del menu restaurante
     @FXML 
     private void opcionesRestaurante() throws Exception{
     //Cagar archivo fxml
-        FXMLLoader loaderRestaurante = new FXMLLoader(
-            getClass().getResource("/com/example/interfazrestaurante/menuPrincipal.fxml")
-        );
-    //Obtener raiz pane
-        Pane menu = loaderRestaurante.load();
-    //Pasar controlador 
-        ControladorMenuRestaurante menuRestaurante = loaderRestaurante.getController();
-        menuRestaurante.setControladorPrincipal(this);
-    //Setear contenedor
-        contenedorPrincipal.setContent(menu);
+        try{
+            FXMLLoader loaderRestaurante = new FXMLLoader(
+                getClass().getResource("/com/example/interfazrestaurante/menuPrincipal.fxml")
+            );
+        //Obtener raiz pane
+            Pane menu = loaderRestaurante.load();
+        //Pasar controlador 
+            ControladorMenuRestaurante menuRestaurante = loaderRestaurante.getController();
+            menuRestaurante.setControladorPrincipal(principal);
+        //Setear contenedor
+            contenedorPrincipal.setContent(menu);
+        }
+        catch(IOException e){
+            dialogosMensajes.mensajeError("Informacion error",
+            "No se pudo cargar la interfaz, intente de nuevo.");
+            return;
+        }
     }
 
 //Metodo para ir a la interfaz simulacion
@@ -121,15 +151,16 @@ public class controladorPrincipal {
             );
     //Obtener raiz y setear contenedor
             Pane interfaz = loaderSimulacion.load();
-
+        //Cargar controlador de la interfaz y setear simulacion
             ControladorSeguimiento controlador = loaderSimulacion.getController();
             controlador.setSimulacion(simulacion);
-
+        //Setear contenedor
             contenedorPrincipal.setContent(interfaz);
         }
         catch(IOException e){
             dialogosMensajes.mensajeError("Informacion error", 
-            "No se pudo cargar la interfaz.");
+            "No se pudo cargar la interfaz, intente de nuevo.");
+            return;
         }
     }
 
@@ -146,10 +177,10 @@ public class controladorPrincipal {
             FXMLLoader loaderSimulacion = new FXMLLoader(
                 getClass().getResource("/com/example/pruebaUbicacion.fxml")
             );
-    //Obtener raiz y setear contenedor
+        //Obtener raiz y setear contenedor
             Scene escenaNueva = new Scene(loaderSimulacion.load());
             Stage nuevaVentana = new Stage();
-
+        //Dar propieades a la stage
             nuevaVentana.setTitle("Ubicacion");
             nuevaVentana.setScene(escenaNueva);
             nuevaVentana.initModality(Modality.APPLICATION_MODAL);
@@ -158,8 +189,8 @@ public class controladorPrincipal {
         }
         catch(IOException e){
             dialogosMensajes.mensajeError("Informacion error", 
-            "No se pudo cargar la interfaz.");
-            e.printStackTrace();
+            "No se pudo cargar la interfaz, intente de nuevo.");
+            return;
         }
     }
 
@@ -183,13 +214,20 @@ public class controladorPrincipal {
     @FXML 
     private void interfazRepartidor() throws IOException{
     //Cargar archivo fxml
-        FXMLLoader loaderRepartidor = new FXMLLoader(
-            getClass().getResource("/com/example/interfazrepartidor/interfazPrincipal.fxml")
-        );
-    //Obtener raiz pane
-        Pane repartidor = loaderRepartidor.load();
-    //Setear contenedor 
-        contenedorPrincipal.setContent(repartidor);
+        try{
+            FXMLLoader loaderRepartidor = new FXMLLoader(
+                getClass().getResource("/com/example/interfazrepartidor/interfazPrincipal.fxml")
+            );
+        //Obtener raiz pane
+            Pane repartidor = loaderRepartidor.load();
+        //Setear contenedor 
+            contenedorPrincipal.setContent(repartidor);
+        }
+        catch(IOException e){
+            dialogosMensajes.mensajeError("Mensaje error", 
+            "No se pudo cargar la interfaz, intente de nuevos.");
+            return;
+        }
     }
 
 //*****Metodo iniciales********* 
@@ -251,6 +289,22 @@ public class controladorPrincipal {
             btnRegistroNegocio.setDisable(true);
             btnSesion.setDisable(true);
         }
+    }
+
+//Metodo para ocular opciones disponibles del negocio o cliente despues de cerrar cesion
+    @FXML 
+    public void ocultarOpciones(){
+    //Si la sesion esta activa con un cliente
+        if(datosSesionCliente.getIdCliente()!=null){
+            btnCliente.setDisable(true);
+        }
+    //Su la sesion esta activa con un negocio
+        if(datosSesionRestaurante.getIdRestaurante()!=null){
+            btnRestaurante.setDisable(true);
+        }
+        btnSesion.setDisable(false);
+        btnRegistroCliente.setDisable(false);
+        btnRegistroNegocio.setDisable(false);
     }
 
 //Metodo de inicializacion

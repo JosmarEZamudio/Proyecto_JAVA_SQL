@@ -35,7 +35,7 @@ public class ControladorHistorialCliente {
     @FXML 
     private TableColumn<Historial,LocalDate> tbcFecha;
     @FXML 
-    private TableColumn<Historial,Integer> tbcEstado;
+    private TableColumn<Historial,String> tbcEstado;
 //Objetos de java para la tabla detalle pedido
     @FXML 
     private TableView<DetalleHistorial> tbvDetalle;
@@ -66,20 +66,20 @@ public class ControladorHistorialCliente {
     //Declara variables donde se guardara el resultado de la consulta momentaneamente
         int idPedido;
         LocalDate fecha;
-        int estado;
+        //int estado;
     //Sentencia sql
-        String sql = "SELECT id_pedido,fecha,estado FROM pedido WHERE id_cliente = ?";
+        String sql = "SELECT id_pedido,fecha,estado FROM pedido WHERE id_cliente = ? AND estado = ?";
     //Abre try Connection y Prepared
         try(Connection conexion = controladorConectorPool.conectar();
             PreparedStatement consultar = conexion.prepareStatement(sql);){
                 consultar.setInt(1, id);
+                consultar.setInt(2,0);
                 try(ResultSet resultado = consultar.executeQuery();){
                     while(resultado.next()){
                         idPedido = resultado.getInt("id_pedido");
                         fecha = resultado.getDate("fecha").toLocalDate();
-                        estado = resultado.getInt("estado");
                         lista.add(
-                            new Historial(idPedido, fecha, estado)
+                            new Historial(idPedido, fecha, "Entregado al cliente.")
                         );
                     }
                 }//Ciera segundo try ResultSet

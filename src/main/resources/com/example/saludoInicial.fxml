@@ -10,17 +10,17 @@
          <font>
             <Font size="18.0" />
          </font></Label>
-      <Label layoutX="42.0" layoutY="91.0" prefHeight="108.0" prefWidth="435.0" text="Bienvenido a este sistema de simulacion de repartos, pruebalo tanto como gustes. El sistema consta de una fase de registro, una serie de interfaces para el negocio al igual que el cliente, interfaces para el repartidor y finalmente una interfaz para la simulacion de entrega." textAlignment="JUSTIFY" wrapText="true">
+      <Label layoutX="42.0" layoutY="91.0" prefHeight="108.0" prefWidth="435.0" text="Bienvenido a este sistema de simulacion de repartos, pruebalo tanto como gustes. El sistema consta de una fase de registro, una serie de interfaces para el negocio al igual que el cliente, interfaces para el repartidor (limitado) y finalmente una interfaz para la simulacion de entrega." textAlignment="JUSTIFY" wrapText="true">
          <font>
             <Font size="14.0" />
          </font></Label>
-      <Label layoutX="42.0" layoutY="212.0" prefHeight="121.0" prefWidth="435.0" text="La fase de simulacion, solo mostrara los elementos usados, es decir: la ubicacion del repartidor, la ubicacion del negocio y cliente, finalmente una parte donde se mostrara el  movimiento del repartidor. Desde luego es una simulacion con distancias euclidianas, es decir, con distancias rectas, en el cuadrante +,+ con una logitud de 100 en X y Y." textAlignment="JUSTIFY" wrapText="true">
+      <Label layoutX="42.0" layoutY="212.0" prefHeight="121.0" prefWidth="435.0" text="La fase de simulacion, solo mostrara los elementos usados, es decir: la ubicacion del repartidor, la ubicacion del negocio y cliente, finalmente una parte donde se mostrara el  movimiento del repartidor. Se puede escoger la direccion a traves de la seleccion de un punto del mapa o a traves de la busqueda, almacenando las longitudes y latitudes reales." textAlignment="JUSTIFY" wrapText="true">
          <font>
             <Font size="14.0" />
          </font>
       </Label>
       <Label layoutX="427.0" layoutY="428.0" text="Josmar E." />
-      <Label layoutX="42.0" layoutY="350.0" prefHeight="46.0" prefWidth="435.0" text="La fase de asignacion, es realizada mediante una heuristica, conocida como NNH, Nearest Neighboor Hueristic." textAlignment="JUSTIFY" wrapText="true">
+      <Label layoutX="42.0" layoutY="350.0" prefHeight="64.0" prefWidth="435.0" text="La fase de asignacion, es realizada mediante una heuristica, conocida como NNH, Nearest Neighboor Hueristic. El repartidor solo puede tener una entrega a la vez." textAlignment="JUSTIFY" wrapText="true">
          <font>
             <Font size="14.0" />
          </font>
